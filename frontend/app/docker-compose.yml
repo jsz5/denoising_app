@@ -1,0 +1,14 @@
+version: "3.8"
+
+services:
+  denoising-front:
+    container_name: denoising-front
+    restart: on-failure
+    build:
+      dockerfile: ./Dockerfile
+      context: .
+    ports:
+    - "8080:8080"
+    volumes:
+      - .:/app:cached
+
