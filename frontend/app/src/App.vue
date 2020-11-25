@@ -8,7 +8,7 @@
 
 <script>
 
-  import Images from '@/components/Images';
+  import Images from '@/components/images';
 
   export default {
     name: 'App',

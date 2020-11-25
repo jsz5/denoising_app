@@ -166,6 +166,7 @@
                                                 :max="addNoiseIntensityMax"
                                                 :min="addNoiseIntensityMin"
                                                 :step="addNoiseIntensityStep"
+                                                @change="addNoiseByType"
                                         >
                                             <template v-slot:append>
                                                 <v-text-field
@@ -177,7 +178,9 @@
                                                 ></v-text-field>
                                             </template>
                                         </v-slider>
-                                        <canvas ref="canvasAddNoise"></canvas>
+                                        <div :key="canvasAddNoiseKey">
+                                            <canvas ref="canvasAddNoise"></canvas>
+                                        </div>
                                     </v-card>
 
                                     <v-btn
@@ -189,6 +192,9 @@
 
                                     <v-btn text @click="cancelAddNoiseDialog">
                                         Anuluj
+                                    </v-btn>
+                                    <v-btn text @click="acceptAddNoise">
+                                        Ok
                                     </v-btn>
                                 </v-stepper-content>
                             </v-stepper-items>
@@ -202,7 +208,10 @@
 </template>
 
 <script>
+  // import NormalDistribution from 'normal-distribution'
+
   export default {
+
     name: "Images",
     data: () => {
       return {
@@ -213,13 +222,14 @@
           ],
           "Zakłócenie": [
             {"name": "Usuń szum", "method": "removeNoise"},
-            {"name": "Usuń deszcz", "method": "removeRain"}
-          ],
-          "Obraz": [
-            {"name": "Zmień kontrast", "method": "changeContrast"},
-            {"name": "Barwa i nasycenie", "method": "hueSaturation"},
+            {"name": "Usuń deszcz", "method": "removeRain"},
             {"name": "Dodaj szum", "method": "addNoise"},
             {"name": "Dodaj efekt deszczu", "method": "addRain"}
+          ],
+          "Obraz wynikowy": [
+            {"name": "Zmień kontrast", "method": "changeContrast"},
+            {"name": "Barwa i nasycenie", "method": "hueSaturation"}
+
           ]
         },
         fileUploadDialog: false,
@@ -232,10 +242,14 @@
         addSP: "addSP",
         addGaussianSigma: 0,
         addSPProbability: 0,
-        addNoiseIntensitySlider: 1,
+        addNoiseIntensitySlider: 0.02,
         addNoiseIntensityMin: 0,
-        addNoiseIntensityMax: 1,
+        addNoiseIntensityMax: 0.2,
         addNoiseIntensityStep: 0.01,
+        canvasAddNoiseKey: 1,
+        resultMat: null,
+        noiseMat: null,
+        ref: null
       }
     },
     methods: {
@@ -251,15 +265,15 @@
       },
       continueAddNoise() {
         this.nextStep()
-        console.log(this.addNoiseRadioGroup)
+        this.addNoiseByType()
+      },
+      addNoiseByType() {
+        this.ref = this.$refs.canvasAddNoise
         if (this.addNoiseRadioGroup === this.addGaussian) {
-          console.log("LLLL")
           this.addGaussianNoise()
         } else {
-          console.log("KKK")
           this.addSaltPepperNoise()
         }
-
       },
       cancelAddNoiseDialog() {
         this.addNoiseDialog = false
@@ -269,57 +283,88 @@
         this.addSPProbability = 0
 
       },
-      addGaussianNoise() {
-        console.log("rrrr")
-        let src = this.$cv2.imread(this.$refs.imageSrc)
-        let row = 37, col = 34;
-
-        if (src.isContinuous()) {
-          let R = src.data[row * src.cols * src.channels() + col * src.channels()];
-          let G = src.data[row * src.cols * src.channels() + col * src.channels() + 1];
-          let B = src.data[row * src.cols * src.channels() + col * src.channels() + 2];
-          console.log(R, G, B)
-          src.data[row * src.cols * src.channels() + col * src.channels()] = 0
-          G = 0
-          B = 0
-          let R2 = src.data[row * src.cols * src.channels() + col * src.channels()];
-          let G2 = src.data[row * src.cols * src.channels() + col * src.channels() + 1];
-          let B2 = src.data[row * src.cols * src.channels() + col * src.channels() + 2];
-          console.log(R2, G2, B2)
+      addNoiseSrc() {
+        let src
+        console.log(this.resultMat)
+        if (this.resultMat == null) {
+          src = this.$cv2.imread(this.$refs.imageSrc)
+        } else {
+          let output = this.$cv2.imread(this.$refs.canvasOutput)
+          src = output.clone()
         }
-
-
-        // let A = src.ucharAt(row, col * src.channels() + 3);
-        console.log("uuuuu")
-        //
-        // let R2 = src.ucharAt(row, col * src.channels());
-        // let G2 = src.ucharAt(row, col * src.channels() + 1);
-        // let B2 = src.ucharAt(row, col * src.channels() + 2);
-        // console.log(R2, G2, B2)
-
-
-        console.log("ppppp")
-
-
-        // this.$cv2.cvtColor(src, gray, this.$cv2.COLOR_RGBA2GRAY)
-        // this.$cv2.imshow(this.$refs.canvasAddNoise, gray)        // this.$cv2.cvtColor(src, gray, this.$cv2.COLOR_RGBA2GRAY)
+        return src
+      },
+      addGaussianNoisePerChannel(randomNormal, color) {
+        let random_normal = randomNormal({mean: 0, dev: this.addNoiseIntensitySlider}) * 255
+        let with_noise = random_normal + color
+        if (with_noise > 255) {
+          with_noise = 255
+        }
+        if (with_noise < 0) {
+          with_noise = 0
+        }
+        return with_noise
+      },
+      addGaussianNoise() {
+        let src = this.addNoiseSrc()
+        var randomNormal = require('random-normal');
+        if (src.isContinuous()) {
+          for (var i = 0; i < src.rows; i++) {
+            for (var j = 0; j < src.cols; j++) {
+              let index = i * src.cols * src.channels() + j * src.channels()
+              src.data[index] = this.addGaussianNoisePerChannel(randomNormal, src.data[index])
+              src.data[index + 1] = this.addGaussianNoisePerChannel(randomNormal, src.data[index + 1])
+              src.data[index + 2] = this.addGaussianNoisePerChannel(randomNormal, src.data[index + 2])
+            }
+          }
+        }
         this.$cv2.imshow(this.$refs.canvasAddNoise, src)
-      },
+        this.noiseMat = src
+      }
+      ,
       addSaltPepperNoise() {
-
-      },
+        let src = this.addNoiseSrc()
+        if (src.isContinuous()) {
+          for (var i = 0; i < src.rows; i++) {
+            for (var j = 0; j < src.cols; j++) {
+              let randomNumber = Math.random()
+              let index = i * src.cols * src.channels() + j * src.channels()
+              let noiseValue = null
+              if (randomNumber < (this.addNoiseIntensitySlider / 2)) {
+                noiseValue = 0
+              } else if (randomNumber < this.addNoiseIntensitySlider) {
+                noiseValue = 255
+              }
+              if (noiseValue != null) {
+                src.data[index] = noiseValue
+                src.data[index + 1] = noiseValue
+                src.data[index + 2] = noiseValue
+              }
+            }
+          }
+        }
+        this.$cv2.imshow(this.ref, src)
+        this.noiseMat = src
+      }
+      ,
       uploadFile() {
         this.fileUploadDialog = true
-        console.log("FFF")
       }
       ,
       callMethod(method, args = []) {
-        console.log("KKK")
         this[method](...args)
-      },
+      }
+      ,
       addNoise() {
         this.addNoiseDialog = true
-      },
+      }
+      ,
+      acceptAddNoise() {
+        this.$cv2.imshow(this.$refs.canvasOutput, this.noiseMat)
+        this.resultMat = this.noiseMat.clone()
+        this.cancelAddNoiseDialog()
+      }
+      ,
       click() {
         console.log('click')
         let src = this.$cv2.imread(this.$refs.imageSrc)

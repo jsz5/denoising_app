@@ -12,9 +12,11 @@
     "@mdi/font": "^3.6.95",
     "core-js": "^3.6.5",
     "opencv.js": "^1.2.1",
+    "random-normal": "^1.0.0",
     "roboto-fontface": "*",
     "vue": "^2.6.11",
-    "vuetify": "^2.2.11"
+    "vuetify": "^2.2.11",
+    "vuex": "^3.5.1"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
