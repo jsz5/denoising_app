@@ -14,14 +14,14 @@
                     {{ key }}
                 </v-btn>
             </template>
-
             <v-list>
                 <v-list-item
                         v-for="item in value"
-                        :key="item"
+                        :key="item['name']"
+                        @click="callMethod(item['method'])"
                         link
                 >
-                    <v-list-item-title v-text="item"></v-list-item-title>
+                    <v-list-item-title v-text="item['name']"></v-list-item-title>
                 </v-list-item>
             </v-list>
         </v-menu>
@@ -30,14 +30,30 @@
 
 <script>
   export default {
-    name: "Menu",
+    name: "ImageMenu",
     data: () => ({
       menu: {
-        "Plik": ["Otwórz", "Pobierz"],
-        "Zakłócenie": ["Usuń szum", "Usuń deszcz"],
-        "Obraz": [ "Zmień kontrast", "Barwa i nasycenie","Dodaj szum", "Dodaj efekt deszczu"]
+        "Plik": [
+          {"name": "Otwórz obraz", "method": "uploadFile"},
+          {"name": "Pobierz obraz wynikowy", "method": "downloadFile"}
+        ],
+        "Zakłócenie": [
+          {"name": "Usuń szum", "method": "removeNoise"},
+          {"name": "Usuń deszcz", "method": "removeRain"},
+          {"name": "Dodaj szum", "method": "addNoise"},
+          {"name": "Dodaj efekt deszczu", "method": "addRain"}
+        ],
+        "Obraz wynikowy": [
+          {"name": "Zmień kontrast", "method": "changeContrast"},
+          {"name": "Barwa i nasycenie", "method": "hueSaturation"}
+        ]
       }
     }),
+    methods: {
+      callMethod(method) {
+        this.$store.commit("images/" + method);
+      }
+    }
   }
 </script>
 

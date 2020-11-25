@@ -2,7 +2,8 @@ const state = {
   refs: null,
   fileUploadDialog: false,
   addNoiseDialog: false,
-  resultMat: null
+  resultMat: null,
+  noiseRadioGroup: null
 
 };
 
@@ -42,8 +43,11 @@ const mutations = {
   cancelAddNoiseDialog(state) {
     state.addNoiseDialog = false
   },
-  setResultMat(state,result){
-    state.resultMat=result
+  setResultMat(state, result) {
+    state.resultMat = result
+  },
+  setNoiseRadioGroup(state, value) {
+    state.noiseRadioGroup = value
   }
 };
 

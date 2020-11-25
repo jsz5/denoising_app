@@ -30,34 +30,11 @@
                             <v-stepper-content
                                     step="1"
                             >
-                                <v-card
-                                        class="mb-12"
-                                >
-                                    <v-card-title>
-                                        Wybierz rodzaj szumu
-                                    </v-card-title>
-                                    <v-card-text>
-                                        <v-radio-group v-model="addNoiseRadioGroup">
-                                            <v-radio-group
-                                                    v-model="addNoiseRadioGroup"
-                                                    column
-                                            >
-                                                <v-radio
-                                                        label="Szum gaussowski"
-                                                        :value="addGaussian"
-                                                ></v-radio>
-                                                <v-radio
-                                                        label="Szum typu pieprz i sól"
-                                                        :value="addSP"
-                                                ></v-radio>
-                                            </v-radio-group>
-                                        </v-radio-group>
-                                    </v-card-text>
-                                </v-card>
+                                <noise-type-v-card :gaussian="gaussian" :sp="sp" ></noise-type-v-card>
                                 <v-btn
                                         color="primary"
                                         disabled
-                                        v-if="!addNoiseRadioGroup"
+                                        v-if="!noiseRadioGroup"
                                 >
                                     Kontunuuj
 
@@ -130,15 +107,16 @@
 
 <script>
   import {mapState, mapGetters} from "vuex";
+  import NoiseTypeVCard from "./base/noiseTypeVCard";
 
   export default {
     name: "addNoise",
+    components: {NoiseTypeVCard},
     data: () => {
       return {
         noiseStepper: 1,
-        addNoiseRadioGroup: null,
-        addGaussian: "addGaussian",
-        addSP: "addSP",
+        gaussian: "addGaussian",
+        sp: "addSP",
         addNoiseIntensitySlider: 0.02,
         addNoiseIntensityMin: 0,
         addNoiseIntensityMax: 0.2,
@@ -147,8 +125,8 @@
       }
     },
     computed: {
-      ...mapState("images", ["addNoiseDialog", "refs", "resultMat"]),
-      ...mapGetters("images",["getRefs"])
+      ...mapState("images", ["addNoiseDialog", "refs", "resultMat","noiseRadioGroup"]),
+      ...mapGetters("images", ["getRefs"])
     },
     methods: {
       nextStep() {
@@ -158,8 +136,8 @@
         this.nextStep()
         this.setInitialParams()
       },
-      setInitialParams(){
-        if (this.addNoiseRadioGroup === this.addGaussian) {
+      setInitialParams() {
+        if (this.noiseRadioGroup === this.gaussian) {
           this.addNoiseIntensitySlider = 0.05
           this.addNoiseIntensityMin = 0
           this.addNoiseIntensityMax = 0.3
@@ -171,7 +149,7 @@
         this.addNoiseByType()
       },
       addNoiseByType() {
-        if (this.addNoiseRadioGroup === this.addGaussian) {
+        if (this.noiseRadioGroup === this.gaussian) {
           this.addGaussianNoise()
         } else {
           this.addSaltPepperNoise()
@@ -180,7 +158,7 @@
       cancelAddNoiseDialog() {
         this.$store.commit('images/cancelAddNoiseDialog')
         this.noiseStepper = 1
-        this.addNoiseRadioGroup = null
+        this.$store.commit('images/setNoiseRadioGroup',null)
       },
       addNoiseSrc() {
         let src
@@ -246,7 +224,7 @@
       },
       acceptAddNoise() {
         this.$cv2.imshow(this.getRefs.canvasOutput, this.noiseMat)
-        this.$store.commit('images/setResultMat',this.noiseMat.clone())
+        this.$store.commit('images/setResultMat', this.noiseMat.clone())
         this.cancelAddNoiseDialog()
       }
 
