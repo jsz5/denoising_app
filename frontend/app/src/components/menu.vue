@@ -44,7 +44,7 @@
           {"name": "Dodaj efekt deszczu", "method": "addRain"}
         ],
         "Obraz wynikowy": [
-          {"name": "Zmień kontrast", "method": "changeContrast"},
+          {"name": "Zmień kontrast i jasność", "method": "brightnessContrast"},
           {"name": "Barwa i nasycenie", "method": "hueSaturation"}
         ]
       }

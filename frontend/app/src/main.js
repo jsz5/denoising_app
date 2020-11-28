@@ -6,10 +6,12 @@ import '@mdi/font/css/materialdesignicons.css'
 import '@babel/polyfill'
 import * as cv2 from 'opencv.js'
 import store from './store'
+import * as utils from './scripts/utils'
 
 
 Vue.config.productionTip = false
 Vue.prototype.$cv2 = cv2
+Vue.prototype.$utils = utils
 
 
 new Vue({

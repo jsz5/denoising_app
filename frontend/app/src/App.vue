@@ -1,8 +1,6 @@
 <template>
     <v-app>
-
         <Images></Images>
-
     </v-app>
 </template>
 

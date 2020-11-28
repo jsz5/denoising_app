@@ -8,11 +8,13 @@
             <v-col>
                 <canvas ref="canvasOutput"></canvas>
                 <div class="caption">canvasOutput</div>
+                <brightness-contrast></brightness-contrast>
             </v-col>
 
         </v-row>
         <upload-image></upload-image>
         <add-noise></add-noise>
+
 
     </v-container>
 
@@ -24,9 +26,10 @@
   import UploadImage from "./uploadImage";
   import AddNoise from "./addNoise";
   import ImageMenu from "./menu";
+  import BrightnessContrast from "./brightnessContrast";
   export default {
     name: "Images",
-    components: {ImageMenu, AddNoise, UploadImage},
+    components: {BrightnessContrast, ImageMenu, AddNoise, UploadImage},
     created: function () {
       this.$store.commit("images/setImagesRef", this.$refs);
     }

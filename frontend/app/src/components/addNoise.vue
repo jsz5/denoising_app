@@ -30,7 +30,7 @@
                             <v-stepper-content
                                     step="1"
                             >
-                                <noise-type-v-card :gaussian="gaussian" :sp="sp" ></noise-type-v-card>
+                                <noise-type-v-card :gaussian="gaussian" :sp="sp"></noise-type-v-card>
                                 <v-btn
                                         color="primary"
                                         disabled
@@ -109,6 +109,7 @@
   import {mapState, mapGetters} from "vuex";
   import NoiseTypeVCard from "./base/noiseTypeVCard";
 
+
   export default {
     name: "addNoise",
     components: {NoiseTypeVCard},
@@ -125,7 +126,7 @@
       }
     },
     computed: {
-      ...mapState("images", ["addNoiseDialog", "refs", "resultMat","noiseRadioGroup"]),
+      ...mapState("images", ["addNoiseDialog", "refs", "resultMat", "noiseRadioGroup"]),
       ...mapGetters("images", ["getRefs"])
     },
     methods: {
@@ -158,7 +159,7 @@
       cancelAddNoiseDialog() {
         this.$store.commit('images/cancelAddNoiseDialog')
         this.noiseStepper = 1
-        this.$store.commit('images/setNoiseRadioGroup',null)
+        this.$store.commit('images/setNoiseRadioGroup', null)
       },
       addNoiseSrc() {
         let src
@@ -172,14 +173,7 @@
       },
       addGaussianNoisePerChannel(randomNormal, color) {
         let random_normal = randomNormal({mean: 0, dev: this.addNoiseIntensitySlider}) * 255
-        let with_noise = random_normal + color
-        if (with_noise > 255) {
-          with_noise = 255
-        }
-        if (with_noise < 0) {
-          with_noise = 0
-        }
-        return with_noise
+        return this.$utils.clipValue(random_normal + color)
       },
       addGaussianNoise() {
         let src = this.addNoiseSrc()
@@ -188,9 +182,9 @@
           for (var i = 0; i < src.rows; i++) {
             for (var j = 0; j < src.cols; j++) {
               let index = i * src.cols * src.channels() + j * src.channels()
-              src.data[index] = this.addGaussianNoisePerChannel(randomNormal, src.data[index])
-              src.data[index + 1] = this.addGaussianNoisePerChannel(randomNormal, src.data[index + 1])
-              src.data[index + 2] = this.addGaussianNoisePerChannel(randomNormal, src.data[index + 2])
+              for (var c = 0; c < 3; c++) {
+                src.data[index+c] = this.addGaussianNoisePerChannel(randomNormal, src.data[index+c])
+              }
             }
           }
         }
@@ -199,6 +193,7 @@
       }
       ,
       addSaltPepperNoise() {
+        console.log(this.$store.dispatch('images/getSourceImage'))
         let src = this.addNoiseSrc()
         if (src.isContinuous()) {
           for (var i = 0; i < src.rows; i++) {
@@ -212,9 +207,9 @@
                 noiseValue = 255
               }
               if (noiseValue != null) {
-                src.data[index] = noiseValue
-                src.data[index + 1] = noiseValue
-                src.data[index + 2] = noiseValue
+                for (var c = 0; c < 3; c++) {
+                   src.data[index+c] = noiseValue
+                }
               }
             }
           }

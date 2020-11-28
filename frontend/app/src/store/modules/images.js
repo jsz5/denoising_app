@@ -3,7 +3,9 @@ const state = {
   fileUploadDialog: false,
   addNoiseDialog: false,
   resultMat: null,
-  noiseRadioGroup: null
+  noiseRadioGroup: null,
+  brightnessContrastDialog: false
+
 
 };
 
@@ -11,7 +13,8 @@ const actions = {
   newImage(store, sourceImage) {
     store.commit('newImage', sourceImage);
     store.commit('cancelUploadFile');
-  }
+  },
+
 
 };
 
@@ -29,7 +32,6 @@ const mutations = {
   },
   newImage(state, sourceImage) {
     state.refs.imageSrc.src = URL.createObjectURL(sourceImage)
-    console.log(state.refs)
   },
   uploadFile(state) {
     state.fileUploadDialog = true
@@ -43,11 +45,20 @@ const mutations = {
   cancelAddNoiseDialog(state) {
     state.addNoiseDialog = false
   },
+  brightnessContrast(state) {
+    state.brightnessContrastDialog = true
+  },
+  cancelBrightnessContrastDialog(state) {
+    state.brightnessContrastDialog = false
+  },
   setResultMat(state, result) {
     state.resultMat = result
   },
   setNoiseRadioGroup(state, value) {
     state.noiseRadioGroup = value
+  },
+  setInitialContrast(state) {
+    state.initialContrast = false
   }
 };
 
