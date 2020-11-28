@@ -4,7 +4,8 @@ const state = {
   addNoiseDialog: false,
   resultMat: null,
   noiseRadioGroup: null,
-  brightnessContrastDialog: false
+  showFilter: null,
+  resultObjectUrl: null
 
 
 };
@@ -14,7 +15,10 @@ const actions = {
     store.commit('newImage', sourceImage);
     store.commit('cancelUploadFile');
   },
-
+  saveFiltersChange(store, payload) {
+    store.commit('setFiltersChange', payload);
+    store.commit('cancelFilter');
+  }
 
 };
 
@@ -31,7 +35,22 @@ const mutations = {
     state.refs = refs
   },
   newImage(state, sourceImage) {
-    state.refs.imageSrc.src = URL.createObjectURL(sourceImage)
+    let image_url = URL.createObjectURL(sourceImage)
+    state.resultObjectUrl = URL.createObjectURL(sourceImage)
+    state.refs.imageSrc.src = image_url
+    var img = new Image();
+    img.onload = function () {
+      var ctx = state.refs.canvasOutput.getContext('2d');
+      ctx.canvas.width = img.width
+      ctx.canvas.height = img.height
+      ctx.drawImage(img, 0, 0);
+    }
+    img.src = image_url
+    console.log(img.src)
+  },
+  setOutputAsResult(state) {
+    state.resultObjectUrl = state.refs.canvasOutput.toDataURL()
+    state.showBrightnessContrast = false
   },
   uploadFile(state) {
     state.fileUploadDialog = true
@@ -46,10 +65,31 @@ const mutations = {
     state.addNoiseDialog = false
   },
   brightnessContrast(state) {
-    state.brightnessContrastDialog = true
+    state.showFilter = "brightnessContrast"
+    state.refs.canvasOutput.setAttribute('style', 'filter:brightness(1) contrast(1) hue-rotate(1) saturate(1)');
+
   },
-  cancelBrightnessContrastDialog(state) {
-    state.brightnessContrastDialog = false
+  hueSaturation(state) {
+    state.showFilter = "hueSaturation"
+    state.refs.canvasOutput.setAttribute('style', 'filter:brightness(1) contrast(1) hue-rotate(1) saturate(1)');
+  },
+  setFiltersChange(state, filters) {
+    var img = new Image();
+    img.onload = function () {
+      var ctx = state.refs.canvasOutput.getContext('2d');
+      ctx.filter = filters
+      ctx.drawImage(img, 0, 0);
+      state.refs.canvasOutput.toBlob(function (blob) {
+        state.resultObjectUrl = URL.createObjectURL(blob);
+      });
+    }
+    img.src = state.resultObjectUrl
+
+  },
+  cancelFilter(state) {
+    state.showFilter = null
+    state.refs.canvasOutput.setAttribute('style', 'filter:brightness(1) contrast(1) hue-rotate(1) saturate(1)');
+
   },
   setResultMat(state, result) {
     state.resultMat = result

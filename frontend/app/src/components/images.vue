@@ -6,9 +6,9 @@
                 <img ref="imageSrc" alt="No Image"/>
             </v-col>
             <v-col>
-                <canvas ref="canvasOutput"></canvas>
-                <div class="caption">canvasOutput</div>
-                <brightness-contrast></brightness-contrast>
+                <canvas ref="canvasOutput" width="450"></canvas>
+                <brightness-contrast v-if="showFilter==='brightnessContrast'"></brightness-contrast>
+                <hue-saturation  v-if="showFilter==='hueSaturation'"></hue-saturation>
             </v-col>
 
         </v-row>
@@ -27,12 +27,19 @@
   import AddNoise from "./addNoise";
   import ImageMenu from "./menu";
   import BrightnessContrast from "./brightnessContrast";
+  import {mapState} from "vuex";
+  import HueSaturation from "./hueSaturation";
+
   export default {
     name: "Images",
-    components: {BrightnessContrast, ImageMenu, AddNoise, UploadImage},
+    components: {HueSaturation, BrightnessContrast, ImageMenu, AddNoise, UploadImage},
     created: function () {
       this.$store.commit("images/setImagesRef", this.$refs);
-    }
+    },
+    computed: {
+      ...mapState("images", ["showFilter"]),
+
+    },
   }
 
 
