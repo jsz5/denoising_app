@@ -1,10 +1,9 @@
 FROM nvidia/cuda:10.1-base
 CMD nvidia-smi
 
-ENV PYTHONUNBUFFERED 1
-ENV PYTHONPATH /code:$PYTHONPATH
 
-RUN apt-get update && apt-get install --no-install-recommends --no-install-suggests -y curl
+
+RUN apt-get update && apt-get install --no-install-recommends --no-install-suggests -y curl libjpeg-dev libsm6 libxext6 libxrender-dev
 RUN apt-get -y install python3
 RUN apt-get -y install python3-pip
 
@@ -13,8 +12,13 @@ RUN pip3 --no-cache-di install -r  /tmp/requirements.txt \
     && apt-get clean
 
 RUN mkdir /code
-COPY . /code/
 WORKDIR /code
+COPY . /code/
+
+
+ENV PYTHONUNBUFFERED 1
+ENV PYTHONPATH /code:$PYTHONPATH
+ENV DJANGO_SETTINGS_MODULE app.settings
 
 EXPOSE 8000
 CMD ["python3", "manage.py", "migrate"]
