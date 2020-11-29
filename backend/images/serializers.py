@@ -8,12 +8,10 @@ import cv2
 class NoiseTypeSerializer(serializers.Serializer):
     noise = serializers.CharField()
     file = serializers.SerializerMethodField()
-    noise_params = serializers.SerializerMethodField()
 
     default_error_messages = {
         "invalid_noise": "Błędny typ zakłócenia",
-        "invalid_format": "Błędny format",
-        "invalid_data": "Błędne dane",
+        "invalid_format": "Błędny format"
     }
 
     def validate_noise(self, value):
@@ -31,6 +29,14 @@ class NoiseTypeSerializer(serializers.Serializer):
         self.validate_file(file)
         image = np.asarray(bytearray(file.read()), dtype="uint8")
         return cv2.imdecode(image, cv2.IMREAD_COLOR)
+
+
+class AddNoiseSerializer(NoiseTypeSerializer):
+    noise_params = serializers.SerializerMethodField()
+
+    default_error_messages = {
+        "invalid_data": "Błędne dane",
+    }
 
     def get_noise_params(self, obj):
         if "noise_params" not in self.context["request"].keys():

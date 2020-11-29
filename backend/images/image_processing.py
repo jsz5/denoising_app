@@ -93,3 +93,5 @@ class Noise:
         for i in range(256):
             look_up[0, i] = np.clip(pow(i / 255.0, gamma) * 255.0, 0, 255)
         return cv2.LUT(image, look_up)
+
+

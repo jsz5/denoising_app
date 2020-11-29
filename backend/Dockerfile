@@ -8,6 +8,7 @@ RUN apt-get -y install python3
 RUN apt-get -y install python3-pip
 
 COPY ./requirements.txt  /tmp/requirements.txt
+RUN pip3 install torch==1.7.0+cu101 torchvision==0.8.1+cu101 -f https://download.pytorch.org/whl/torch_stable.html
 RUN pip3 --no-cache-di install -r  /tmp/requirements.txt \
     && apt-get clean
 
