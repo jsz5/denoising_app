@@ -108,7 +108,7 @@
 <script>
   import {mapState, mapGetters} from "vuex";
   import NoiseTypeVCard from "./base/noiseTypeVCard";
-
+  import axios from "axios";
 
   export default {
     name: "addNoise",
@@ -131,6 +131,14 @@
     },
     methods: {
       nextStep() {
+        axios
+          .get('https://api.exchangeratesapi.io/latest')
+          .then(response => {
+            console.log(response.data)
+          })
+          .catch(error => {
+            console.log(error)
+          })
         this.noiseStepper = (this.noiseStepper % 2) + 1;
       },
       continueAddNoise() {
@@ -183,7 +191,7 @@
             for (var j = 0; j < src.cols; j++) {
               let index = i * src.cols * src.channels() + j * src.channels()
               for (var c = 0; c < 3; c++) {
-                src.data[index+c] = this.addGaussianNoisePerChannel(randomNormal, src.data[index+c])
+                src.data[index + c] = this.addGaussianNoisePerChannel(randomNormal, src.data[index + c])
               }
             }
           }
@@ -208,7 +216,7 @@
               }
               if (noiseValue != null) {
                 for (var c = 0; c < 3; c++) {
-                   src.data[index+c] = noiseValue
+                  src.data[index + c] = noiseValue
                 }
               }
             }

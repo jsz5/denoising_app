@@ -7,7 +7,7 @@ import '@babel/polyfill'
 import * as cv2 from 'opencv.js'
 import store from './store'
 import * as utils from './scripts/utils'
-
+import router from './router'
 
 Vue.config.productionTip = false
 Vue.prototype.$cv2 = cv2
@@ -17,5 +17,6 @@ Vue.prototype.$utils = utils
 new Vue({
   vuetify,
   store,
+  router,
   render: h => h(App)
 }).$mount('#app')
