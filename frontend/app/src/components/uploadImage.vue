@@ -23,7 +23,7 @@
                         <v-btn
                                 color="green darken-1"
                                 text
-                                @click="$store.dispatch('images/newImage',sourceImage)"
+                                @click="uploadImage"
                         >
                             Otwórz
                         </v-btn>
@@ -42,7 +42,7 @@
 </template>
 
 <script>
-  import {mapState} from "vuex";
+  import {mapState, mapActions} from "vuex";
 
   export default {
     name: "uploadImage",
@@ -52,7 +52,21 @@
       }
     },
     computed: {
-      ...mapState("images", ["fileUploadDialog"])
+      ...mapState("images", ["fileUploadDialog"]),
+    },
+    methods: {
+      ...mapActions("images", ["newImage"]),
+      uploadImage() {
+        let _this=this
+        this.newImage(_this.sourceImage).then(
+          () => {
+            console.log("aaaaaaa")
+          },
+          error => {
+            console.log(error.data)
+          }
+        );
+      }
     }
   }
 </script>

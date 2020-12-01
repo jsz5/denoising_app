@@ -78,9 +78,10 @@
                                             ></v-text-field>
                                         </template>
                                     </v-slider>
-                                    <div>
-                                        <canvas ref="canvasAddNoise"></canvas>
-                                    </div>
+                                    <v-img
+                                            :src="noiseImage"
+                                    >
+                                    </v-img>
                                 </v-card>
 
                                 <v-btn
@@ -109,6 +110,7 @@
   import {mapState, mapGetters} from "vuex";
   import NoiseTypeVCard from "./base/noiseTypeVCard";
   import axios from "axios";
+  import {baseUrl} from "../utils/helper";
 
   export default {
     name: "addNoise",
@@ -116,29 +118,24 @@
     data: () => {
       return {
         noiseStepper: 1,
-        gaussian: "addGaussian",
-        sp: "addSP",
+        gaussian: "gaussian",
+        sp: "sp",
         addNoiseIntensitySlider: 0.02,
         addNoiseIntensityMin: 0,
         addNoiseIntensityMax: 0.2,
         addNoiseIntensityStep: 0.01,
         noiseMat: null,
+        noiseImage: null
+
       }
     },
     computed: {
-      ...mapState("images", ["addNoiseDialog", "refs", "resultMat", "noiseRadioGroup"]),
+      ...mapState("images", ["addNoiseDialog", "refs", "resultMat", "noiseRadioGroup", "backendImageUrl"]),
       ...mapGetters("images", ["getRefs"])
     },
     methods: {
+
       nextStep() {
-        axios
-          .get('https://api.exchangeratesapi.io/latest')
-          .then(response => {
-            console.log(response.data)
-          })
-          .catch(error => {
-            console.log(error)
-          })
         this.noiseStepper = (this.noiseStepper % 2) + 1;
       },
       continueAddNoise() {
@@ -158,76 +155,36 @@
         this.addNoiseByType()
       },
       addNoiseByType() {
-        if (this.noiseRadioGroup === this.gaussian) {
-          this.addGaussianNoise()
-        } else {
-          this.addSaltPepperNoise()
-        }
+        console.log("EEEEEEEEEEEEEEEEEEEEds")
+        let _this = this
+        this.getRefs.canvasOutput.toBlob(function (blob) {
+          const formData = new FormData();
+          formData.append('file', blob)
+          formData.append("noise", _this.noiseRadioGroup)
+          formData.append('noise_params', JSON.stringify({"intensity": _this.addNoiseIntensitySlider}))
+          formData.append('url', _this.backendImageUrl)
+          let __this = _this
+          axios.post(baseUrl + '/images/add-noise', formData, {headers: {'Content-Type': 'multipart/form-data'}}).then(response => {
+            console.log(response.data)
+            __this.noiseImage = baseUrl + response.data
+            __this.$store.commit('images/setBackendImageUrl', response.data);
+          })
+            .catch(error => {
+              console.log(error)
+            })
+        });
+
       },
       cancelAddNoiseDialog() {
         this.$store.commit('images/cancelAddNoiseDialog')
         this.noiseStepper = 1
         this.$store.commit('images/setNoiseRadioGroup', null)
       },
-      addNoiseSrc() {
-        let src
-        if (this.resultMat == null) {
-          src = this.$cv2.imread(this.getRefs.imageSrc)
-        } else {
-          let output = this.$cv2.imread(this.getRefs.canvasOutput)
-          src = output.clone()
-        }
-        return src
-      },
-      addGaussianNoisePerChannel(randomNormal, color) {
-        let random_normal = randomNormal({mean: 0, dev: this.addNoiseIntensitySlider}) * 255
-        return this.$utils.clipValue(random_normal + color)
-      },
-      addGaussianNoise() {
-        let src = this.addNoiseSrc()
-        var randomNormal = require('random-normal');
-        if (src.isContinuous()) {
-          for (var i = 0; i < src.rows; i++) {
-            for (var j = 0; j < src.cols; j++) {
-              let index = i * src.cols * src.channels() + j * src.channels()
-              for (var c = 0; c < 3; c++) {
-                src.data[index + c] = this.addGaussianNoisePerChannel(randomNormal, src.data[index + c])
-              }
-            }
-          }
-        }
-        this.$cv2.imshow(this.$refs.canvasAddNoise, src)
-        this.noiseMat = src
-      }
-      ,
-      addSaltPepperNoise() {
-        console.log(this.$store.dispatch('images/getSourceImage'))
-        let src = this.addNoiseSrc()
-        if (src.isContinuous()) {
-          for (var i = 0; i < src.rows; i++) {
-            for (var j = 0; j < src.cols; j++) {
-              let randomNumber = Math.random()
-              let index = i * src.cols * src.channels() + j * src.channels()
-              let noiseValue = null
-              if (randomNumber < (this.addNoiseIntensitySlider / 2)) {
-                noiseValue = 0
-              } else if (randomNumber < this.addNoiseIntensitySlider) {
-                noiseValue = 255
-              }
-              if (noiseValue != null) {
-                for (var c = 0; c < 3; c++) {
-                  src.data[index + c] = noiseValue
-                }
-              }
-            }
-          }
-        }
-        this.$cv2.imshow(this.$refs.canvasAddNoise, src)
-        this.noiseMat = src
-      },
       acceptAddNoise() {
-        this.$cv2.imshow(this.getRefs.canvasOutput, this.noiseMat)
-        this.$store.commit('images/setResultMat', this.noiseMat.clone())
+        // this.$cv2.imshow(this.getRefs.canvasOutput, this.noiseMat)
+        // this.newImage(this.noiseImage)
+        // this.$store.commit('images/setResultMat', this.noiseMat.clone())
+        this.$store.commit('images/setCanvasOutput', this.noiseImage)
         this.cancelAddNoiseDialog()
       }
 

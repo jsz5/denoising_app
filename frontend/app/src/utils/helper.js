@@ -1,3 +1,6 @@
+const baseUrl = "http://127.0.0.1:8000"
+
+
 function clipValue(value) {
   if (value > 255) {
     value = 255
@@ -7,4 +10,5 @@ function clipValue(value) {
   }
   return value
 }
-export {clipValue};
+
+export {clipValue, baseUrl};

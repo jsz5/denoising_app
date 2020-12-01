@@ -1,3 +1,6 @@
+import axios from "axios";
+import {baseUrl} from "../../utils/helper";
+
 const state = {
   refs: null,
   fileUploadDialog: false,
@@ -5,19 +8,37 @@ const state = {
   resultMat: null,
   noiseRadioGroup: null,
   showFilter: null,
-  resultObjectUrl: null
+  resultImageBlob: null,
+  backendImageUrl: null
 
 
 };
 
 const actions = {
   newImage(store, sourceImage) {
-    store.commit('newImage', sourceImage);
-    store.commit('cancelUploadFile');
+    const formData = new FormData();
+    formData.append('file', sourceImage)
+    return new Promise((resolve, reject) => {
+      axios.post(baseUrl + '/images/upload', formData, {headers: {'Content-Type': 'multipart/form-data'}})
+        .then(function (response) {
+          resolve(response);
+          store.commit('setBackendImageUrl', response.data);
+          store.commit('setResultImageBlob', URL.createObjectURL(sourceImage));
+          let url = URL.createObjectURL(sourceImage)
+          store.commit('setImageRefSrc', url);
+          store.commit('setCanvasOutput', url);
+          store.commit('cancelUploadFile');
+          console.log(response.data)
+        })
+        .catch(function (error) {
+          reject(error);
+        });
+    })
   },
   saveFiltersChange(store, payload) {
     store.commit('setFiltersChange', payload);
     store.commit('cancelFilter');
+
   }
 
 };
@@ -34,10 +55,7 @@ const mutations = {
   setImagesRef(state, refs) {
     state.refs = refs
   },
-  newImage(state, sourceImage) {
-    let image_url = URL.createObjectURL(sourceImage)
-    state.resultObjectUrl = URL.createObjectURL(sourceImage)
-    state.refs.imageSrc.src = image_url
+  setCanvasOutput(state, url) {
     var img = new Image();
     img.onload = function () {
       var ctx = state.refs.canvasOutput.getContext('2d');
@@ -45,11 +63,18 @@ const mutations = {
       ctx.canvas.height = img.height
       ctx.drawImage(img, 0, 0);
     }
-    img.src = image_url
-    console.log(img.src)
+    img.src = url
+  },
+  setOutputCanvas(imageUrl) {
+    var img = new Image();
+    img.onload = function () {
+      var ctx = state.refs.canvasOutput.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+    }
+    img.src = imageUrl
   },
   setOutputAsResult(state) {
-    state.resultObjectUrl = state.refs.canvasOutput.toDataURL()
+    state.resultImageBlob = state.refs.canvasOutput.toDataURL()
     state.showBrightnessContrast = false
   },
   uploadFile(state) {
@@ -80,10 +105,10 @@ const mutations = {
       ctx.filter = filters
       ctx.drawImage(img, 0, 0);
       state.refs.canvasOutput.toBlob(function (blob) {
-        state.resultObjectUrl = URL.createObjectURL(blob);
+        state.resultImageBlob = URL.createObjectURL(blob);
       });
     }
-    img.src = state.resultObjectUrl
+    img.src = state.resultImageBlob
 
   },
   cancelFilter(state) {
@@ -99,6 +124,16 @@ const mutations = {
   },
   setInitialContrast(state) {
     state.initialContrast = false
+  },
+  setBackendImageUrl(state, url) {
+    state.backendImageUrl = url
+    console.log(state.backendImageUrl)
+  },
+  setResultImageBlob(state, url) {
+    state.resultImageBlob = url
+  },
+  setImageRefSrc(state, url) {
+    state.refs.imageSrc.src = url
   }
 };
 

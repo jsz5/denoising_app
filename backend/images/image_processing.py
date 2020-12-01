@@ -10,7 +10,7 @@ class Noise:
     def gaussian(self, mean=0):
         self.image = self.image / 255
         # Generate Gaussian noise
-        noise = np.random.normal(mean, self.noise_params["sigma"], self.image.shape)
+        noise = np.random.normal(mean, self.noise_params["intensity"], self.image.shape)
         # Superimpose noise and image
         result = self.image + noise
         # Set more than 1 to 1, and less than 0 to 0
@@ -19,7 +19,7 @@ class Noise:
         return np.uint8(result * 255)
 
     def sp(self):
-        probability = 1 - self.noise_params["probability"]
+        probability = 1 - self.noise_params["intensity"]
         transposed_img = self.image.transpose(2, 1, 0)  # grupujemy każdy kolor
         channels, height, width = transposed_img.shape
         mask = np.random.choice(("real", "salt", "pepper"), size=(1, height, width),
@@ -27,7 +27,8 @@ class Noise:
         mask = np.repeat(mask, channels, axis=0)  # kopiujemy dla każdego kanału, żeby miało rozmiar obrazu
         transposed_img[mask == "salt"] = 255  # salt and pepper na każdym kolorze r,g,b
         transposed_img[mask == "pepper"] = 0  #
-        return transposed_img.transpose(2, 1, 0)
+        return np.uint8(transposed_img.transpose(2, 1, 0))
+
 
     def rain(self):
         """
@@ -86,7 +87,7 @@ class Noise:
         filter_img = cv2.filter2D(img, -1, kernel)
         crop_img = filter_img[0:self.image.shape[0], ]
         result = cv2.add(self.image, crop_img)
-        return cv2.cvtColor(result, cv2.COLOR_RGBA2RGB)
+        return np.uint8(cv2.cvtColor(result, cv2.COLOR_RGBA2RGB))
 
     def __gamma_correction(self, gamma, image):
         look_up = np.empty((1, 256), np.uint8)
