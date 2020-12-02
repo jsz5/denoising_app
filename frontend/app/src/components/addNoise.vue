@@ -91,7 +91,7 @@
                                     Cofnij
                                 </v-btn>
 
-                                <v-btn text @click="cancelAddNoiseDialog">
+                                <v-btn text @click="cancelAddNoiseDialog(noiseBackendUrl)">
                                     Anuluj
                                 </v-btn>
                                 <v-btn text @click="acceptAddNoise">
@@ -125,7 +125,8 @@
         addNoiseIntensityMax: 0.2,
         addNoiseIntensityStep: 0.01,
         noiseMat: null,
-        noiseImage: null
+        noiseImage: null,
+        noiseBackendUrl: null
 
       }
     },
@@ -155,37 +156,37 @@
         this.addNoiseByType()
       },
       addNoiseByType() {
-        console.log("EEEEEEEEEEEEEEEEEEEEds")
         let _this = this
-        this.getRefs.canvasOutput.toBlob(function (blob) {
-          const formData = new FormData();
-          formData.append('file', blob)
-          formData.append("noise", _this.noiseRadioGroup)
-          formData.append('noise_params', JSON.stringify({"intensity": _this.addNoiseIntensitySlider}))
-          formData.append('url', _this.backendImageUrl)
-          let __this = _this
-          axios.post(baseUrl + '/images/add-noise', formData, {headers: {'Content-Type': 'multipart/form-data'}}).then(response => {
-            console.log(response.data)
-            __this.noiseImage = baseUrl + response.data
-            __this.$store.commit('images/setBackendImageUrl', response.data);
-          })
-            .catch(error => {
-              console.log(error)
-            })
-        });
+        const formData = new FormData();
+        formData.append('image_url', this.backendImageUrl)
+        formData.append("noise", this.noiseRadioGroup)
+        formData.append('noise_params', JSON.stringify({"intensity": this.addNoiseIntensitySlider}))
+        formData.append('old_image', this.noiseBackendUrl)
 
+        axios.post(baseUrl + '/images/add-noise', formData).then(response => {
+          console.log(response.data)
+          _this.noiseImage = baseUrl + response.data
+          _this.noiseBackendUrl = response.data
+        })
+          .catch(error => {
+            console.log(error)
+          })
       },
-      cancelAddNoiseDialog() {
+      cancelAddNoiseDialog(oldImageUrl) {
         this.$store.commit('images/cancelAddNoiseDialog')
+        axios.post(baseUrl + '/images/remove-image', {"image_url":oldImageUrl}).then(response => {
+          console.log(response.data)
+        })
         this.noiseStepper = 1
+        this.noiseImage=null
+        this.noiseBackendUrl= null
         this.$store.commit('images/setNoiseRadioGroup', null)
       },
       acceptAddNoise() {
-        // this.$cv2.imshow(this.getRefs.canvasOutput, this.noiseMat)
-        // this.newImage(this.noiseImage)
-        // this.$store.commit('images/setResultMat', this.noiseMat.clone())
-        this.$store.commit('images/setCanvasOutput', this.noiseImage)
-        this.cancelAddNoiseDialog()
+        let backendUrl=this.backendImageUrl
+        this.$store.commit('images/setBackendImageUrl', this.noiseBackendUrl)
+        this.$store.commit('images/setCanvasOutput', baseUrl+this.noiseBackendUrl)
+        this.cancelAddNoiseDialog(backendUrl)
       }
 
     }

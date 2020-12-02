@@ -2,17 +2,17 @@ import json
 
 from rest_framework import serializers
 
-from images.utils import image_to_numpy
+from django.conf import settings
+
+from images.utils import get_full_url
 
 
 class NoiseTypeSerializer(serializers.Serializer):
     noise = serializers.CharField()
-    url = serializers.CharField()
-    file = serializers.SerializerMethodField()
+    image_url = serializers.CharField()
 
     default_error_messages = {
-        "invalid_noise": "Błędny typ zakłócenia",
-        "invalid_format": "Błędny format"
+        "invalid_noise": "Błędny typ zakłócenia"
     }
 
     def validate_noise(self, value):
@@ -20,19 +20,22 @@ class NoiseTypeSerializer(serializers.Serializer):
             self.fail("invalid_noise")
         return value
 
-    def get_file(self, obj):
-        return image_to_numpy(self.context["file"])
+    def validate(self, attrs):
+        attrs["image_url"] = get_full_url(attrs["image_url"])
+        return attrs
+
+
 
 
 class AddNoiseSerializer(NoiseTypeSerializer):
     noise_params = serializers.SerializerMethodField()
+    old_image = serializers.CharField()
 
     default_error_messages = {
         "invalid_data": "Błędne dane",
     }
 
     def get_noise_params(self, obj):
-
         if "noise_params" not in self.context["request"].keys():
             self.fail("invalid_data")
         noise_params = self.context["request"]["noise_params"]
@@ -41,3 +44,8 @@ class AddNoiseSerializer(NoiseTypeSerializer):
         if obj["noise"] == "rain" and any(param not in noise_params for param in ["intensity", "kernel_size", "angle"]):
             self.fail("invalid_data")
         return json.loads(noise_params)
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        attrs["old_image"] = get_full_url(attrs["old_image"])
+        return attrs

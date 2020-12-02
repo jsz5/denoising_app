@@ -1,6 +1,9 @@
 <template>
     <v-container>
         <v-row>
+            <img crossOrigin="anonymous" src="" id="dataimage" style=" visibility: hidden;"/>
+        </v-row>
+        <v-row>
             <v-subheader class="pl-0">
                 Kontrast
             </v-subheader>
@@ -67,7 +70,10 @@
 </template>
 
 <script>
-  import {mapGetters} from "vuex";
+  import {mapGetters, mapState} from "vuex";
+  import {baseUrl} from "../utils/helper";
+  // import axios from "axios";
+  // import axios from "axios";
 
 
   export default {
@@ -81,6 +87,7 @@
       }
     },
     computed: {
+      ...mapState("images", ["backendImageUrl"]),
       ...mapGetters("images", ["getRefs"])
     },
     watch: {
@@ -97,9 +104,16 @@
         img.setAttribute('style', 'filter:brightness(' + this.brightnessSlider + ') contrast(' + this.contrastSlider + ')')
 
       },
-      saveChanges(){
-        let filters="brightness(" + this.brightnessSlider + ")contrast(" + this.contrastSlider + ")"
-        this.$store.dispatch('images/saveFiltersChange',filters)
+      saveChanges() {
+        var canvas = this.getRefs.canvasOutput
+        var ctx = canvas.getContext('2d');
+        ctx.filter = "brightness(" + this.brightnessSlider + ") contrast(" + this.contrastSlider + ")"
+        console.log(ctx.filter)
+        var img = document.getElementById("dataimage");
+        img.src = baseUrl + this.backendImageUrl
+        img.crossOrigin = "anonymus"
+        ctx.drawImage(img, 0, 0);
+        this.$store.dispatch('images/saveFiltersChange', canvas.toDataURL('image/png'))
       }
     }
   }

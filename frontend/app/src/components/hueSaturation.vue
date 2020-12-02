@@ -1,6 +1,9 @@
 <template>
     <v-container>
         <v-row>
+            <img crossOrigin="anonymous" src="" id="huesaturationimage" style=" visibility: hidden;"/>
+        </v-row>
+        <v-row>
             <v-subheader class="pl-0">
                 Barwa
             </v-subheader>
@@ -67,7 +70,8 @@
 </template>
 
 <script>
-  import {mapGetters} from "vuex";
+  import {mapGetters, mapState} from "vuex";
+  import {baseUrl} from "../utils/helper";
 
 
   export default {
@@ -81,6 +85,7 @@
       }
     },
     computed: {
+      ...mapState("images", ["backendImageUrl"]),
       ...mapGetters("images", ["getRefs"])
     },
     watch: {
@@ -94,13 +99,22 @@
     methods: {
       changeHueSaturation() {
         var img = this.getRefs.canvasOutput
-        img.setAttribute('style', 'filter:hue-rotate(' + this.hueSlider + 'turn)'+' saturate(' + this.saturationSlider + ')')
+        img.setAttribute('style', 'filter:hue-rotate(' + this.hueSlider + 'turn)' + ' saturate(' + this.saturationSlider + ')')
 
 
       },
-      saveChanges(){
-        let filters="hue-rotate(" + this.hueSlider + "turn)saturate(" + this.saturationSlider + ")"
-        this.$store.dispatch('images/saveFiltersChange',filters)
+      saveChanges() {
+        var canvas = this.getRefs.canvasOutput
+        var ctx = canvas.getContext('2d');
+        ctx.filter = "hue-rotate(" + this.hueSlider + "turn) saturate(" + this.saturationSlider + ")"
+        console.log(ctx.filter)
+        var img = document.getElementById("huesaturationimage");
+        img.src = baseUrl + this.backendImageUrl
+        img.crossOrigin = "anonymus"
+        ctx.drawImage(img, 0, 0);
+        console.log(img.src)
+        this.$store.dispatch('images/saveFiltersChange', canvas.toDataURL('image/png'))
+
       }
     }
   }

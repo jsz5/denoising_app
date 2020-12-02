@@ -3,8 +3,8 @@ import numpy as np
 
 
 class Noise:
-    def __init__(self, image, noise_params):
-        self.image = image
+    def __init__(self, image_url, noise_params):
+        self.image = cv2.imread(image_url)
         self.noise_params = noise_params
 
     def gaussian(self, mean=0):
@@ -28,7 +28,6 @@ class Noise:
         transposed_img[mask == "salt"] = 255  # salt and pepper na każdym kolorze r,g,b
         transposed_img[mask == "pepper"] = 0  #
         return np.uint8(transposed_img.transpose(2, 1, 0))
-
 
     def rain(self):
         """
@@ -94,5 +93,3 @@ class Noise:
         for i in range(256):
             look_up[0, i] = np.clip(pow(i / 255.0, gamma) * 255.0, 0, 255)
         return cv2.LUT(image, look_up)
-
-

@@ -16,17 +16,18 @@ const state = {
 
 const actions = {
   newImage(store, sourceImage) {
+
     const formData = new FormData();
-    formData.append('file', sourceImage)
+    formData.append('new_image', sourceImage)
     return new Promise((resolve, reject) => {
       axios.post(baseUrl + '/images/upload', formData, {headers: {'Content-Type': 'multipart/form-data'}})
         .then(function (response) {
           resolve(response);
+          console.log(baseUrl + response.data)
           store.commit('setBackendImageUrl', response.data);
-          store.commit('setResultImageBlob', URL.createObjectURL(sourceImage));
           let url = URL.createObjectURL(sourceImage)
           store.commit('setImageRefSrc', url);
-          store.commit('setCanvasOutput', url);
+          store.commit('setCanvasOutput', baseUrl + response.data);
           store.commit('cancelUploadFile');
           console.log(response.data)
         })
@@ -35,10 +36,26 @@ const actions = {
         });
     })
   },
-  saveFiltersChange(store, payload) {
-    store.commit('setFiltersChange', payload);
-    store.commit('cancelFilter');
+  saveFiltersChange(store, dataURL) {
+    const formData = new FormData();
+    formData.append('file', dataURL)
+    formData.append('old_url', state.backendImageUrl)
+    return new Promise((resolve, reject) => {
+      axios.post(baseUrl + '/images/save-image', formData, {
+        headers: {
+          'Content-Type': "multipart/form-data"
+        }
+      }).then(response => {
+        store.commit('setBackendImageUrl', response.data)
+        store.commit('cancelFilter');
+        store.commit('setCanvasOutput', baseUrl + response.data)
 
+        resolve(response);
+      }).catch(function (error) {
+        reject(error);
+      });
+    })
+ 
   }
 
 };
@@ -63,7 +80,10 @@ const mutations = {
       ctx.canvas.height = img.height
       ctx.drawImage(img, 0, 0);
     }
+    img.crossOrigin = "anonymous"
     img.src = url
+    console.log(img.src)
+
   },
   setOutputCanvas(imageUrl) {
     var img = new Image();
@@ -71,6 +91,7 @@ const mutations = {
       var ctx = state.refs.canvasOutput.getContext('2d');
       ctx.drawImage(img, 0, 0);
     }
+    img.crossOrigin = "anonymous"
     img.src = imageUrl
   },
   setOutputAsResult(state) {
@@ -98,19 +119,7 @@ const mutations = {
     state.showFilter = "hueSaturation"
     state.refs.canvasOutput.setAttribute('style', 'filter:brightness(1) contrast(1) hue-rotate(1) saturate(1)');
   },
-  setFiltersChange(state, filters) {
-    var img = new Image();
-    img.onload = function () {
-      var ctx = state.refs.canvasOutput.getContext('2d');
-      ctx.filter = filters
-      ctx.drawImage(img, 0, 0);
-      state.refs.canvasOutput.toBlob(function (blob) {
-        state.resultImageBlob = URL.createObjectURL(blob);
-      });
-    }
-    img.src = state.resultImageBlob
 
-  },
   cancelFilter(state) {
     state.showFilter = null
     state.refs.canvasOutput.setAttribute('style', 'filter:brightness(1) contrast(1) hue-rotate(1) saturate(1)');
@@ -127,6 +136,7 @@ const mutations = {
   },
   setBackendImageUrl(state, url) {
     state.backendImageUrl = url
+    console.log("backend result")
     console.log(state.backendImageUrl)
   },
   setResultImageBlob(state, url) {
