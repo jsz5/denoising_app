@@ -25,27 +25,44 @@ class NoiseTypeSerializer(serializers.Serializer):
         return attrs
 
 
-
-
-class AddNoiseSerializer(NoiseTypeSerializer):
-    noise_params = serializers.SerializerMethodField()
+class ImageProcessingSerializer(serializers.Serializer):
+    params = serializers.SerializerMethodField()
     old_image = serializers.CharField()
+    method = serializers.CharField()
+    image_url = serializers.CharField()
 
     default_error_messages = {
         "invalid_data": "Błędne dane",
     }
 
-    def get_noise_params(self, obj):
-        if "noise_params" not in self.context["request"].keys():
+    def get_params(self, obj):
+        if "params" not in self.context["request"].keys():
             self.fail("invalid_data")
-        noise_params = self.context["request"]["noise_params"]
-        if obj["noise"] in ["gaussian", "sp"] and "intensity" not in noise_params:
+        params = self.context["request"]["params"]
+        if obj["method"] in ["gaussian", "sp"] and "intensity" not in params:
             self.fail("invalid_data")
-        if obj["noise"] == "rain" and any(param not in noise_params for param in ["intensity", "kernel_size", "angle"]):
+        if obj["method"] == "rain" and any(param not in params for param in ["intensity", "kernel_size", "angle"]):
             self.fail("invalid_data")
-        return json.loads(noise_params)
+        if obj["method"] == "contrast_and_brightness" and any(
+                param not in params for param in ["contrast", "brightness"]):
+            self.fail("invalid_data")
+        return json.loads(params)
+
+    def validate_method(self, value):
+        if value not in ["gaussian", "sp", "rain", "contrast_and_brightness"]:
+            self.fail("invalid_noise")
+        return value
 
     def validate(self, attrs):
-        attrs = super().validate(attrs)
+        attrs["image_url"] = get_full_url(attrs["image_url"])
         attrs["old_image"] = get_full_url(attrs["old_image"])
         return attrs
+
+
+class ImageSerializer(serializers.Serializer):
+    image_url = serializers.CharField()
+
+
+class ContrastBrightnessSerializer(ImageSerializer):
+    contrast = serializers.FloatField()
+    brightness = serializers.FloatField()

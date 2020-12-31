@@ -20,7 +20,7 @@ const actions = {
     const formData = new FormData();
     formData.append('new_image', sourceImage)
     return new Promise((resolve, reject) => {
-      axios.post(baseUrl + '/images/upload', formData, {headers: {'Content-Type': 'multipart/form-data'}})
+      axios.post(baseUrl + '/images/upload/', formData, {headers: {'Content-Type': 'multipart/form-data'}})
         .then(function (response) {
           resolve(response);
           console.log(baseUrl + response.data)
@@ -41,7 +41,7 @@ const actions = {
     formData.append('file', dataURL)
     formData.append('old_url', state.backendImageUrl)
     return new Promise((resolve, reject) => {
-      axios.post(baseUrl + '/images/save-image', formData, {
+      axios.post(baseUrl + '/images/save-image/', formData, {
         headers: {
           'Content-Type': "multipart/form-data"
         }

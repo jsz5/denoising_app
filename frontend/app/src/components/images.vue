@@ -4,11 +4,21 @@
         <v-row>
             <v-col>
                 <img ref="imageSrc" alt="No Image"/>
+                <v-text-field
+                        value="Oryginalny obraz"
+                        filled
+                        readonly
+                ></v-text-field>
             </v-col>
             <v-col>
                 <canvas ref="canvasOutput" width="450"></canvas>
+                <v-text-field
+                        value="Obraz wynikowy"
+                        filled
+                        readonly
+                ></v-text-field>
                 <brightness-contrast v-if="showFilter==='brightnessContrast'"></brightness-contrast>
-                <hue-saturation  v-if="showFilter==='hueSaturation'"></hue-saturation>
+                <hue-saturation v-if="showFilter==='hueSaturation'"></hue-saturation>
             </v-col>
 
         </v-row>

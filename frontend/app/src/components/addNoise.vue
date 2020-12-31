@@ -159,11 +159,11 @@
         let _this = this
         const formData = new FormData();
         formData.append('image_url', this.backendImageUrl)
-        formData.append("noise", this.noiseRadioGroup)
-        formData.append('noise_params', JSON.stringify({"intensity": this.addNoiseIntensitySlider}))
+        formData.append("method", this.noiseRadioGroup)
+        formData.append('params', JSON.stringify({"intensity": this.addNoiseIntensitySlider}))
         formData.append('old_image', this.noiseBackendUrl)
 
-        axios.post(baseUrl + '/images/add-noise', formData).then(response => {
+        axios.post(baseUrl + '/images/image-processing/', formData).then(response => {
           console.log(response.data)
           _this.noiseImage = baseUrl + response.data
           _this.noiseBackendUrl = response.data
@@ -174,7 +174,7 @@
       },
       cancelAddNoiseDialog(oldImageUrl) {
         this.$store.commit('images/cancelAddNoiseDialog')
-        axios.post(baseUrl + '/images/remove-image', {"image_url":oldImageUrl}).then(response => {
+        axios.post(baseUrl + '/images/remove-image/', {"image_url":oldImageUrl}).then(response => {
           console.log(response.data)
         })
         this.noiseStepper = 1

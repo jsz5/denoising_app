@@ -2,6 +2,7 @@
     <v-container>
         <v-row>
             <img crossOrigin="anonymous" src="" id="dataimage" style=" visibility: hidden;"/>
+
         </v-row>
         <v-row>
             <v-subheader class="pl-0">
@@ -107,12 +108,13 @@
       saveChanges() {
         var canvas = this.getRefs.canvasOutput
         var ctx = canvas.getContext('2d');
-        ctx.filter = "brightness(" + this.brightnessSlider + ") contrast(" + this.contrastSlider + ")"
+        ctx.filter = "brightness(" + '500%' + ") contrast(" + this.contrastSlider + ")"
         console.log(ctx.filter)
         var img = document.getElementById("dataimage");
         img.src = baseUrl + this.backendImageUrl
         img.crossOrigin = "anonymus"
         ctx.drawImage(img, 0, 0);
+
         this.$store.dispatch('images/saveFiltersChange', canvas.toDataURL('image/png'))
       }
     }
