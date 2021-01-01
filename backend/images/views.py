@@ -21,7 +21,7 @@ class ImageProcessingView(APIView):
         serializer.is_valid(raise_exception=True)
         image_processing = ImageProcessing(image_url=serializer.data["image_url"], params=serializer.data["params"])
         result = getattr(image_processing, serializer.data["method"])()
-        if serializer.data['old_image']:
+        if "old_image" in serializer.data and serializer.data['old_image']:
             remove_image(serializer.data['old_image'])
         return Response(save_image(result))
 

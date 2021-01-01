@@ -5,13 +5,14 @@ const state = {
   refs: null,
   fileUploadDialog: false,
   addNoiseDialog: false,
+  removeNoiseDialog: false,
   resultMat: null,
   noiseRadioGroup: null,
   showFilter: null,
   resultImageBlob: null,
-  backendImageUrl: null
-
-
+  backendImageUrl: null,
+  removeRainEpsilon: 0.1,
+  removeRainRadius: 8
 };
 
 const actions = {
@@ -27,16 +28,18 @@ const actions = {
           store.commit('setBackendImageUrl', response.data);
           let url = URL.createObjectURL(sourceImage)
           store.commit('setImageRefSrc', url);
-          store.commit('setCanvasOutput', baseUrl + response.data);
+          let urlWithBase=baseUrl+response.data
+          store.commit('setCanvasOutput', {"url":urlWithBase});
           store.commit('cancelUploadFile');
           console.log(response.data)
         })
         .catch(function (error) {
           reject(error);
-        });
+        });state.refs.canvasOutput
     })
   },
-  saveFiltersChange(store, dataURL) {
+  saveFiltersChange(store) {
+    let dataURL=state.refs.canvasOutput.toDataURL('image/png')
     const formData = new FormData();
     formData.append('file', dataURL)
     formData.append('old_url', state.backendImageUrl)
@@ -48,14 +51,14 @@ const actions = {
       }).then(response => {
         store.commit('setBackendImageUrl', response.data)
         store.commit('cancelFilter');
-        store.commit('setCanvasOutput', baseUrl + response.data)
+        store.commit('setCanvasOutput', {"url":baseUrl + response.data})
 
         resolve(response);
       }).catch(function (error) {
         reject(error);
       });
     })
- 
+
   }
 
 };
@@ -72,12 +75,16 @@ const mutations = {
   setImagesRef(state, refs) {
     state.refs = refs
   },
-  setCanvasOutput(state, url) {
+  setCanvasOutput(state, {url, filters=null}) {
+    console.log(url)
     var img = new Image();
     img.onload = function () {
       var ctx = state.refs.canvasOutput.getContext('2d');
       ctx.canvas.width = img.width
       ctx.canvas.height = img.height
+      if (filters) {
+        ctx.filter = filters
+      }
       ctx.drawImage(img, 0, 0);
     }
     img.crossOrigin = "anonymous"
@@ -101,6 +108,9 @@ const mutations = {
   uploadFile(state) {
     state.fileUploadDialog = true
   },
+  removeNoise(state) {
+    state.removeNoiseDialog = true
+  },
   cancelUploadFile(state) {
     state.fileUploadDialog = false
   },
@@ -109,6 +119,9 @@ const mutations = {
   },
   cancelAddNoiseDialog(state) {
     state.addNoiseDialog = false
+  },
+  cancelRemoveNoiseDialog(state) {
+    state.removeNoiseDialog = false
   },
   brightnessContrast(state) {
     state.showFilter = "brightnessContrast"
@@ -133,6 +146,12 @@ const mutations = {
   },
   setInitialContrast(state) {
     state.initialContrast = false
+  },
+  setRemoveRainRadius(state, value) {
+    state.removeRainRadius = value
+  },
+  removeRainEpsilon(state, value) {
+    state.removeRainEpsilon = value
   },
   setBackendImageUrl(state, url) {
     state.backendImageUrl = url

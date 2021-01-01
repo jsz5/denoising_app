@@ -27,15 +27,17 @@ class NoiseTypeSerializer(serializers.Serializer):
 
 class ImageProcessingSerializer(serializers.Serializer):
     params = serializers.SerializerMethodField()
-    old_image = serializers.CharField()
+    old_image = serializers.CharField(required=False)
     method = serializers.CharField()
     image_url = serializers.CharField()
 
     default_error_messages = {
         "invalid_data": "Błędne dane",
+        "img_doesnt_exists": "Obraz o podanym url nie istnieje",
     }
 
     def get_params(self, obj):
+        print(obj)
         if "params" not in self.context["request"].keys():
             self.fail("invalid_data")
         params = self.context["request"]["params"]
@@ -46,16 +48,24 @@ class ImageProcessingSerializer(serializers.Serializer):
         if obj["method"] == "contrast_and_brightness" and any(
                 param not in params for param in ["contrast", "brightness"]):
             self.fail("invalid_data")
+        if obj["method"] == "remove_rain" and any(
+                param not in params for param in ["radius", "epsilon"]):
+            self.fail("invalid_data")
         return json.loads(params)
 
     def validate_method(self, value):
-        if value not in ["gaussian", "sp", "rain", "contrast_and_brightness"]:
-            self.fail("invalid_noise")
+        print(value)
+        if value not in ["gaussian", "sp", "rain", "contrast_and_brightness","remove_rain"]:
+            self.fail("invalid_data")
         return value
 
     def validate(self, attrs):
-        attrs["image_url"] = get_full_url(attrs["image_url"])
-        attrs["old_image"] = get_full_url(attrs["old_image"])
+        try:
+            attrs["image_url"] = get_full_url(attrs["image_url"])
+            if "old_image" in attrs:
+                attrs["old_image"] = get_full_url(attrs["old_image"])
+        except FileNotFoundError:
+            self.fail("img_doesnt_exists")
         return attrs
 
 

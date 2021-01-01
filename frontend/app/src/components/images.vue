@@ -24,6 +24,7 @@
         </v-row>
         <upload-image></upload-image>
         <add-noise></add-noise>
+        <remove-noise></remove-noise>
 
 
     </v-container>
@@ -39,10 +40,11 @@
   import BrightnessContrast from "./brightnessContrast";
   import {mapState} from "vuex";
   import HueSaturation from "./hueSaturation";
+  import RemoveNoise from "./removeNoise";
 
   export default {
     name: "Images",
-    components: {HueSaturation, BrightnessContrast, ImageMenu, AddNoise, UploadImage},
+    components: {RemoveNoise, HueSaturation, BrightnessContrast, ImageMenu, AddNoise, UploadImage},
     created: function () {
       this.$store.commit("images/setImagesRef", this.$refs);
     },

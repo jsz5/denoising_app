@@ -1,5 +1,5 @@
 import cv2
-import numpy as np
+
 from image_processing import methods
 
 
@@ -21,3 +21,6 @@ class ImageProcessing:
     def contrast_and_brightness(self):
         return methods.contrast_and_brightness(self.image, alpha=self.params["contrast"],
                                                beta=self.params["brightness"])
+
+    def remove_rain(self):
+        return methods.remove_rain(self.image, self.params["radius"], self.params["epsilon"])

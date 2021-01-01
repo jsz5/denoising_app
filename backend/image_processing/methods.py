@@ -103,8 +103,36 @@ def gamma_correction(gamma, image):
 
 
 def contrast_and_brightness(image, alpha, beta):
+    print("A")
     for y in range(image.shape[0]):
         for x in range(image.shape[1]):
             for c in range(image.shape[2]):
                 image[y, x, c] = np.clip(alpha * image[y, x, c] + beta, 0, 255)
+    print("b")
     return image
+
+
+def remove_rain(rain_image, r, epsilon):
+    low_frequency = np.empty(rain_image.shape)
+    new_high_frequency = np.empty(rain_image.shape)
+    result = np.empty(rain_image.shape)
+    epsilon = epsilon ** 2
+    epsilon *= 255 ** 2
+    guided_filter = cv2.ximgproc.createGuidedFilter(rain_image, r, epsilon)
+    low_frequency = guided_filter.filter(rain_image, low_frequency)
+    high_frequency = cv2.subtract(rain_image, low_frequency)
+    laplacian = cv2.Laplacian(low_frequency, cv2.CV_64F, ksize=1)
+    laplacian = np.absolute(laplacian)
+    laplacian = np.uint8(laplacian)
+    low_edges = cv2.addWeighted(low_frequency, 1, laplacian, 0.1, 0)
+    guided_filter2 = cv2.ximgproc.createGuidedFilter(low_edges, r, epsilon)
+    new_high_frequency = guided_filter2.filter(high_frequency, new_high_frequency)
+    recovered = cv2.add(low_edges, new_high_frequency)
+    cleared = np.minimum(recovered, rain_image)
+    b = 0.5
+    refined = (b * cleared) + ((1 - b) * recovered)
+    refined = np.uint8(refined)
+    guided_filter3 = cv2.ximgproc.createGuidedFilter(refined, r, epsilon)
+    result = guided_filter3.filter(cleared, result)
+    return result
+

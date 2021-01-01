@@ -39,9 +39,7 @@
         ],
         "Zakłócenie": [
           {"name": "Usuń szum", "method": "removeNoise"},
-          {"name": "Usuń deszcz", "method": "removeRain"},
-          {"name": "Dodaj szum", "method": "addNoise"},
-          {"name": "Dodaj efekt deszczu", "method": "addRain"}
+          {"name": "Dodaj szum", "method": "addNoise"}
         ],
         "Obraz wynikowy": [
           {"name": "Zmień kontrast i jasność", "method": "brightnessContrast"},
