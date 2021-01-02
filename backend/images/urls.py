@@ -27,10 +27,5 @@ urlpatterns = [
         "save-image/",
         views.SaveImageDataURL.as_view(),
         name="save-image",
-    ),
-    path(
-        "download/",
-        views.DownloadImage.as_view(),
-        name="download",
-    ),
+    )
 ]

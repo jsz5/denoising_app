@@ -73,16 +73,3 @@ class RemoveImage(APIView):
         remove_image(get_full_url(serializer.data["image_url"]))
         return Response("Usunięto pomyślnie")
 
-
-class DownloadImage(APIView):
-    def post(self, request, *args, **kwargs):
-        serializer = ImageSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        try:
-            response = HttpResponse(
-                open(get_full_url(serializer.data["image_url"]), "rb"), content_type="image/png"
-            )
-            response["Content-Disposition"] = f"attachment; filename=image.png"
-        except FileNotFoundError as e:
-            return HttpResponse("Podany obraz nie istnieje.", status=404)
-        return response
