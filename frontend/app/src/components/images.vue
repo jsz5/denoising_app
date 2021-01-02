@@ -1,22 +1,15 @@
 <template>
     <v-container>
         <image-menu></image-menu>
-        <v-row>
-            <v-col>
-                <img ref="imageSrc" alt="No Image"/>
-                <v-text-field
-                        value="Oryginalny obraz"
-                        filled
-                        readonly
-                ></v-text-field>
+        <v-row >
+            <v-col class="imageContainer">
+                <v-subheader class="imageSubheader" v-if="backendImageUrl">Poglądowy obraz oryginalny</v-subheader>
+                <img ref="imageSrc" />
             </v-col>
-            <v-col>
-                <canvas ref="canvasOutput" width="450"></canvas>
-                <v-text-field
-                        value="Obraz wynikowy"
-                        filled
-                        readonly
-                ></v-text-field>
+            <v-col class="imageContainer" v-if="backendImageUrl">
+                <v-subheader class="imageSubheader">Obraz wynikowy</v-subheader>
+                <canvas ref="canvasOutput" ></canvas>
+
                 <brightness-contrast v-if="dialogs['brightnessContrast']"></brightness-contrast>
                 <hue-saturation v-if="dialogs['hueSaturation']"></hue-saturation>
             </v-col>
@@ -49,7 +42,7 @@
       this.$store.commit("images/setImagesRef", this.$refs);
     },
     computed: {
-      ...mapState("images", ["dialogs"]),
+      ...mapState("images", ["dialogs","backendImageUrl","imageHeight","imageWidth"]),
 
     },
   }
@@ -57,6 +50,8 @@
 
 </script>
 
-<style scoped>
-
-</style>
+<!--<style scoped>-->
+<!--div{-->
+<!--    background-color: blue;-->
+<!--}-->
+<!--</style>-->

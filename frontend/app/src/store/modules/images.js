@@ -14,6 +14,8 @@ const state = {
   backendImageUrl: null,
   removeRainEpsilon: 0.1,
   removeRainRadius: 8,
+  imageWidth:200,
+  imageHeight:200
 };
 
 const actions = {

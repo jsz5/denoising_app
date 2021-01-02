@@ -8,7 +8,8 @@ import * as cv2 from 'opencv.js'
 import store from './store'
 import * as utils from './utils/helper'
 import router from './router'
-
+import '@/assets/css/main.css';
+import '@/assets/css/variables.css';
 Vue.config.productionTip = false
 Vue.prototype.$cv2 = cv2
 Vue.prototype.$utils = utils

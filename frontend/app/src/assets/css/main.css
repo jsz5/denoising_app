@@ -1,0 +1,46 @@
+
+#app {
+    background: var(--ligther);
+}
+
+.v-btn {
+    background-color: var(--dark) !important;
+    color: var(--light) !important;
+    border-radius: 0px !important;
+}
+
+.theme--light.v-list {
+    background-color: var(--dark) !important;
+    color: var(--light) !important;
+}
+
+.v-list-group--active > .v-list-group__header .v-list-item__content, .v-list-item__title {
+    color: var(--light);
+    justify-content: center;
+}
+
+.v-list .v-list-item--active {
+    color: var(--light);
+    justify-content: center;
+}
+
+.menuButton {
+    width: 250px;
+    margin: 1px;
+    justify-content: center;
+}
+
+.menuRow {
+    justify-content: center;
+}
+
+.imageContainer>* {
+    justify-content: center;
+    padding-top: 0px!important;
+
+}
+
+.imageSubheader {
+    color: var(--light) !important;
+    font-size: 1rem;
+}

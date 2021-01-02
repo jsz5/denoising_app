@@ -232,7 +232,7 @@
   import {mapState} from "vuex";
   import NoiseTypeVCard from "./base/noiseTypeVCard";
   import axios from "axios";
-  import {baseUrl, rain} from "../utils/helper";
+  import {baseUrl, gaussian, sp, rain} from "../utils/helper";
 
   export default {
     name: "addNoise",
@@ -261,6 +261,14 @@
       },
       continueAddNoise() {
         this.nextStep()
+        this.setInitialParams()
+      },
+      setInitialParams() {
+        if (this.noiseRadioGroup === gaussian) {
+          this.addNoiseIntensitySlider = 0.05
+        } else if (this.noiseRadioGroup === sp) {
+          this.addNoiseIntensitySlider = 0.02
+        }
         this.addNoiseByType()
       },
       addNoiseByType() {

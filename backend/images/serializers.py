@@ -2,8 +2,6 @@ import json
 
 from rest_framework import serializers
 
-from django.conf import settings
-
 from images.utils import get_full_url
 
 

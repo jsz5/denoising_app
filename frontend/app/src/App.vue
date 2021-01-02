@@ -5,8 +5,8 @@
 </template>
 
 <script>
-
   import Images from '@/components/images';
+
 
   export default {
     name: 'App',
@@ -21,3 +21,4 @@
     }),
   };
 </script>
+

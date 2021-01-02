@@ -1,5 +1,5 @@
 <template>
-    <v-row>
+    <v-row class="menuRow">
         <v-menu
                 v-for="(value,key) in menu"
                 :key="key"
@@ -7,9 +7,10 @@
                 offset-y
         >
             <template v-slot:activator="{ attrs, on }">
-                <v-btn
+                <v-btn  class="menuButton"
                         v-bind="attrs"
                         v-on="on"
+
                 >
                     {{ key }}
                 </v-btn>

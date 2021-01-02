@@ -26,6 +26,5 @@ def save_image(image, pil=False):
 
 
 def remove_image(url):
-
     if os.path.exists(url):
         os.remove(url)
