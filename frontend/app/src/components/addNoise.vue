@@ -1,5 +1,5 @@
 <template>
-    <v-container>
+    <v-container fluid>
         <v-row justify="center">
             <v-dialog
                     v-model="dialogs['addNoise']"
@@ -46,6 +46,11 @@
                                     </v-card-text>
 
                                 </v-card>
+
+                                <v-btn text @click="cancelDialog">
+                                    Anuluj
+
+                                </v-btn>
                                 <v-btn
                                         color="primary"
                                         disabled
@@ -55,15 +60,10 @@
 
                                 </v-btn>
                                 <v-btn
-                                        color="primary"
                                         @click="continueAddNoise"
                                         v-else
                                 >
                                     Kontunuuj
-
-                                </v-btn>
-                                <v-btn text @click="cancelDialog">
-                                    Anuluj
 
                                 </v-btn>
 
@@ -75,36 +75,24 @@
                                 <v-card
                                         class="mb-12"
                                 >
+                                    <v-row>
+                                        <v-card-title>
+                                            {{title}}
+                                        </v-card-title>
+                                        <div class="progress-circle">
+                                            <v-progress-circular v-if="loading"
+                                                                 :indeterminate="loading"
+                                                                 color="primary"
+                                            ></v-progress-circular>
+                                        </div>
+                                    </v-row>                   
 
-                                    <v-card-title v-if="noiseRadioGroup=='sp'">
-                                        Dodaj szum pieprz i sól
-                                        <v-progress-circular v-if="loading"
-                                                             :indeterminate="loading"
-                                                             color="primary"
-                                        ></v-progress-circular>
-                                    </v-card-title>
-                                    <v-card-title v-if="noiseRadioGroup=='gaussian'">
-                                        Dodaj szum gaussowski
-                                        <v-progress-circular v-if="loading"
-                                                             :indeterminate="loading"
-                                                             color="primary"
-                                        ></v-progress-circular>
-                                    </v-card-title>
-                                    <v-card-title v-if="noiseRadioGroup=='rain'">
-                                        Dodaj smugi deszczu
-                                        <v-progress-circular v-if="loading"
-                                                             :indeterminate="loading"
-                                                             color="primary"
-                                        ></v-progress-circular>
-                                    </v-card-title>
-
-                                    <v-card-text v-if="noiseRadioGroup!='rain'">
+                                    <v-card-text class="v-card-noise-image" v-if="noiseRadioGroup!='rain'">
                                         <v-row>
                                             <v-col>
-                                                <v-img
-                                                        :src="noiseImage"
-                                                >
-                                                </v-img>
+                                                <img class="add-noise-image"
+                                                     :src="noiseImage"/>
+
                                             </v-col>
                                             <v-col>
                                                 <v-subheader class="pl-0">
@@ -134,10 +122,10 @@
                                     <v-card-text v-else>
                                         <v-row>
                                             <v-col>
-                                                <v-img
-                                                        :src="noiseImage"
-                                                >
-                                                </v-img>
+                                                <img class="add-noise-image"
+                                                     :src="noiseImage"/>
+
+
                                             </v-col>
                                             <v-col>
                                                 <v-subheader class="pl-0">
@@ -207,7 +195,6 @@
                                 </v-card>
 
                                 <v-btn
-                                        color="primary"
                                         @click="nextStep"
                                 >
                                     Cofnij
@@ -249,7 +236,7 @@
         loading: false,
         rainRadius: 8,
         rainEpsilon: 0.1,
-        noiseRadioGroupKey:1
+        noiseRadioGroupKey: 1
       }
     },
     computed: {
@@ -258,6 +245,13 @@
     methods: {
       nextStep() {
         this.noiseStepper = (this.noiseStepper % 2) + 1;
+        if (this.noiseRadioGroup == sp) {
+          this.title = "Dodaj szum pieprz i sól"
+        } else if (this.noiseRadioGroup == gaussian) {
+          this.title = "Dodaj szum gaussowski"
+        } else if (this.noiseRadioGroup == rain) {
+          this.title = "Dodaj smugi deszczu"
+        }
       },
       continueAddNoise() {
         this.nextStep()
@@ -309,9 +303,9 @@
         this.noiseImage = null
         this.noiseBackendUrl = null
       },
-      cancelDialog(){
-         this.$store.commit('images/closeDialog', 'addNoise')
-         this.noiseRadioGroupKey+=1
+      cancelDialog() {
+        this.$store.commit('images/closeDialog', 'addNoise')
+        this.noiseRadioGroupKey += 1
       },
       acceptAddNoise() {
         let backendUrl = this.backendImageUrl

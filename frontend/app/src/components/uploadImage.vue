@@ -4,7 +4,7 @@
             <v-dialog
                     v-model="dialogs['uploadFile']"
                     persistent
-                    max-width="290"
+                    max-width="400"
             >
                 <v-card>
                     <v-card-title>
@@ -20,19 +20,19 @@
                     </v-card-text>
                     <v-card-actions>
                         <v-spacer></v-spacer>
-                        <v-btn
-                                color="green darken-1"
-                                text
-                                @click="uploadImage"
-                        >
-                            Otwórz
-                        </v-btn>
-                        <v-btn
+                           <v-btn
                                 text
                                 @click="$store.commit('images/closeDialog','uploadFile')"
                         >
                             Anuluj
                         </v-btn>
+                        <v-btn
+                                text
+                                @click="uploadImage"
+                        >
+                            Otwórz
+                        </v-btn>
+
 
                     </v-card-actions>
                 </v-card>

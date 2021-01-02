@@ -1,5 +1,9 @@
 :root {
   --dark: #232729;
-  --ligther:  #2b3032;
+  --ligther:  #363b3d;
+  --medium-light:#3c4244;
   --light: #c0c1c2;
+  --blue-color:#4e9dbc;
+  --v-primary-base:#4e9dbc!important;
+  --v-primary-lighten3:#4e9dbc!important;
 }

@@ -7,6 +7,9 @@
     background-color: var(--dark) !important;
     color: var(--light) !important;
     border-radius: 0px !important;
+    width: 110px;
+    height: 42px!important;
+    margin: 1px!important;
 }
 
 .theme--light.v-list {
@@ -34,13 +37,99 @@
     justify-content: center;
 }
 
-.imageContainer>* {
+.imageContainer > * {
     justify-content: center;
-    padding-top: 0px!important;
+    padding-top: 0px !important;
+}
+
+.imageContainer.col {
+    margin-right: 15px;
+    margin-top: 30px;
+}
+
+#originalImageContainer {
+    margin-left: 15px;
+}
+
+.image {
+    width: 46vw;
+    height: 75vh;
+    object-fit: contain;
+}
+
+.add-noise-image {
+    width: 46vw;
+    height: 63vh;
+    object-fit: contain;
 
 }
 
 .imageSubheader {
     color: var(--light) !important;
     font-size: 1rem;
+}
+
+.v-card, .v-card__title {
+    background-color: var(--medium-light) !important;
+    color: var(--light) !important;
+    box-shadow: none !important;
+}
+.progress-circle{
+    margin-top: 15px!important;
+}
+.v-card__actions {
+    color: var(--light) !important;
+    justify-content: flex-end !important;
+}
+.v-card__subtitle{
+    color: var(--light) !important;
+    margin-top: 8px !important;
+    font-size: 1em;
+    padding-bottom: 4px;
+}
+.v-dialog {
+    box-shadow: none;
+    color: var(--light) !important;
+    max-width: 80vw;
+    max-height: 95vh;
+}
+
+.dialog-body {
+    background-color: var(--medium-light) !important;
+    padding-top: 0px !important;
+}
+
+.dialog-header {
+    background-color: var(--medium-light) !important;
+    height: 0px;
+}
+
+.dialog-drag {
+    border: 0px;
+    box-shadow: none;
+
+}
+
+.title {
+    height: 0px;
+}
+
+.v-stepper {
+    background-color: var(--medium-light) !important;
+
+}
+.v-stepper__label{
+     color: var(--light) !important;
+}
+.v-card-noise-image {
+    padding-bottom: 0px !important;
+}
+div.v-input.theme--light.v-input--selection-controls.v-input--radio-group.v-input--radio-group--column{
+    margin-top: 0px;
+}
+label.v-label.theme--light{
+     color: var(--light) !important;
+}
+.v-subheader{
+     color: var(--light) !important;
 }

@@ -1,23 +1,23 @@
 <template>
-    <v-container>
+
+    <v-container fluid>
         <image-menu></image-menu>
-        <v-row >
-            <v-col class="imageContainer">
+        <v-row>
+            <v-col class="imageContainer" id="originalImageContainer">
                 <v-subheader class="imageSubheader" v-if="backendImageUrl">Poglądowy obraz oryginalny</v-subheader>
-                <img ref="imageSrc" />
+                <img class="image" ref="imageSrc" />
             </v-col>
             <v-col class="imageContainer" v-if="backendImageUrl">
                 <v-subheader class="imageSubheader">Obraz wynikowy</v-subheader>
-                <canvas ref="canvasOutput" ></canvas>
-
-                <brightness-contrast v-if="dialogs['brightnessContrast']"></brightness-contrast>
-                <hue-saturation v-if="dialogs['hueSaturation']"></hue-saturation>
+                <canvas ref="canvasOutput" class="image"></canvas>
             </v-col>
 
         </v-row>
-        <upload-image></upload-image>
-        <add-noise></add-noise>
-        <remove-noise></remove-noise>
+        <upload-image v-if="dialogs['uploadFile']"></upload-image>
+        <add-noise v-if="dialogs['addNoise']"></add-noise>
+        <remove-noise v-if="dialogs['removeNoise']"></remove-noise>
+        <brightness-contrast v-if="dialogs['brightnessContrast']"></brightness-contrast>
+        <hue-saturation v-if="dialogs['hueSaturation']"></hue-saturation>
 
 
     </v-container>
@@ -42,16 +42,10 @@
       this.$store.commit("images/setImagesRef", this.$refs);
     },
     computed: {
-      ...mapState("images", ["dialogs","backendImageUrl","imageHeight","imageWidth"]),
+      ...mapState("images", ["dialogs", "backendImageUrl", "imageHeight", "imageWidth"]),
 
     },
   }
 
 
 </script>
-
-<!--<style scoped>-->
-<!--div{-->
-<!--    background-color: blue;-->
-<!--}-->
-<!--</style>-->
