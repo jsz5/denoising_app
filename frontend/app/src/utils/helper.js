@@ -4,6 +4,7 @@ const sp="sp"
 const rain="rain"
 const removeRain="remove_rain"
 const contrast_and_brightness="contrast_and_brightness"
+const color_balance="color_balance"
 
 function clipValue(value) {
   if (value > 255) {
@@ -15,4 +16,4 @@ function clipValue(value) {
   return value
 }
 
-export {clipValue, baseUrl,gaussian,sp,rain,removeRain,contrast_and_brightness};
+export {clipValue, baseUrl,gaussian,sp,rain,removeRain,color_balance,contrast_and_brightness};

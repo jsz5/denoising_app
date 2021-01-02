@@ -2,7 +2,7 @@
     <v-container>
         <v-row justify="center">
             <v-dialog
-                    v-model="addNoiseDialog"
+                    v-model="dialogs['addNoise']"
                     persistent
 
             >
@@ -42,7 +42,7 @@
                                         Wybierz rodzaj zakłócenia
                                     </v-card-subtitle>
                                     <v-card-text>
-                                        <noise-type-v-card :remove="false"></noise-type-v-card>
+                                        <noise-type-v-card :key=noiseRadioGroupKey :remove="false"></noise-type-v-card>
                                     </v-card-text>
 
                                 </v-card>
@@ -62,7 +62,7 @@
                                     Kontunuuj
 
                                 </v-btn>
-                                <v-btn text @click="cancelAddNoiseDialog">
+                                <v-btn text @click="cancelDialog">
                                     Anuluj
 
                                 </v-btn>
@@ -229,10 +229,10 @@
 </template>
 
 <script>
-  import {mapState, mapGetters} from "vuex";
+  import {mapState} from "vuex";
   import NoiseTypeVCard from "./base/noiseTypeVCard";
   import axios from "axios";
-  import {baseUrl, gaussian, sp, rain} from "../utils/helper";
+  import {baseUrl, rain} from "../utils/helper";
 
   export default {
     name: "addNoise",
@@ -248,33 +248,19 @@
         noiseBackendUrl: null,
         loading: false,
         rainRadius: 8,
-        rainEpsilon: 0.1
-
+        rainEpsilon: 0.1,
+        noiseRadioGroupKey:1
       }
     },
     computed: {
-      ...mapState("images", ["addNoiseDialog", "refs", "resultMat", "noiseRadioGroup", "backendImageUrl"]),
-      ...mapGetters("images", ["getRefs"])
+      ...mapState("images", ["dialogs", "noiseRadioGroup", "backendImageUrl"])
     },
     methods: {
-
       nextStep() {
         this.noiseStepper = (this.noiseStepper % 2) + 1;
       },
       continueAddNoise() {
         this.nextStep()
-        this.setInitialParams()
-      },
-      setInitialParams() {
-        if (this.noiseRadioGroup === gaussian) {
-          this.addNoiseIntensitySlider = 0.05
-          this.addNoiseIntensityMin = 0
-          this.addNoiseIntensityMax = 0.3
-        } else if (this.noiseRadioGroup === sp) {
-          this.addNoiseIntensitySlider = 0.02
-          this.addNoiseIntensityMin = 0
-          this.addNoiseIntensityMax = 0.2
-        }
         this.addNoiseByType()
       },
       addNoiseByType() {
@@ -293,11 +279,8 @@
           params["kernel_size"] = this.rainKernelSlider
           params["angle"] = this.rainAngleSlider
         }
-
-
         formData.append('params', JSON.stringify(params))
         formData.append('old_image', this.noiseBackendUrl)
-
         axios.post(baseUrl + '/images/image-processing/', formData).then(response => {
           console.log(response.data)
           _this.noiseImage = baseUrl + response.data
@@ -305,24 +288,27 @@
           _this.loading = false
         })
           .catch(error => {
-            console.log(error)
+            console.log(error.response.data)
           })
       },
 
       cancelAddNoiseDialog(oldImageUrl) {
-        this.$store.commit('images/cancelAddNoiseDialog')
-        axios.post(baseUrl + '/images/remove-image/', {"image_url": oldImageUrl}).then(response => {
-          console.log(response.data)
+        this.cancelDialog()
+        axios.post(baseUrl + '/images/remove-image/', {"image_url": oldImageUrl}).catch(error => {
+          console.log(error.response.data)
         })
         this.noiseStepper = 1
         this.noiseImage = null
         this.noiseBackendUrl = null
-        this.$store.commit('images/setNoiseRadioGroup', null)
+      },
+      cancelDialog(){
+         this.$store.commit('images/closeDialog', 'addNoise')
+         this.noiseRadioGroupKey+=1
       },
       acceptAddNoise() {
         let backendUrl = this.backendImageUrl
         this.$store.commit('images/setBackendImageUrl', this.noiseBackendUrl)
-        this.$store.commit('images/setCanvasOutput', {"url":baseUrl + this.noiseBackendUrl})
+        this.$store.commit('images/setCanvasOutput', {"url": baseUrl + this.noiseBackendUrl})
         this.cancelAddNoiseDialog(backendUrl)
       }
 

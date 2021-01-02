@@ -45,6 +45,9 @@ class ImageProcessingSerializer(serializers.Serializer):
             self.fail("invalid_data")
         if obj["method"] == "rain" and any(param not in params for param in ["intensity", "kernel_size", "angle"]):
             self.fail("invalid_data")
+        if obj["method"] == "color_balance" and any(
+                param not in params for param in ["red", "green", "blue", "saturation"]):
+            self.fail("invalid_data")
         if obj["method"] == "contrast_and_brightness" and any(
                 param not in params for param in ["contrast", "brightness"]):
             self.fail("invalid_data")
@@ -54,8 +57,7 @@ class ImageProcessingSerializer(serializers.Serializer):
         return json.loads(params)
 
     def validate_method(self, value):
-        print(value)
-        if value not in ["gaussian", "sp", "rain", "contrast_and_brightness","remove_rain"]:
+        if value not in ["gaussian", "sp", "rain","contrast_and_brightness","color_balance", "remove_rain"]:
             self.fail("invalid_data")
         return value
 

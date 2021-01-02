@@ -1,5 +1,5 @@
 import cv2
-
+import numpy as np
 from image_processing import methods
 
 
@@ -18,9 +18,18 @@ class ImageProcessing:
         return methods.rain(self.image, self.params["kernel_size"], self.params["angle"],
                             self.params["intensity"])
 
-    def contrast_and_brightness(self):
-        return methods.contrast_and_brightness(self.image, alpha=self.params["contrast"],
-                                               beta=self.params["brightness"])
+    def color_balance(self):
+        image = np.array(self.image).astype(int)
+        result = methods.color_balance(image, self.params["blue"], self.params["green"], self.params["red"])
+        if self.params["saturation"] != 1:
+            result = methods.color_balance(result, self.params["saturation"], self.params["saturation"],
+                                           self.params["saturation"])
+        return result
 
     def remove_rain(self):
         return methods.remove_rain(self.image, self.params["radius"], self.params["epsilon"])
+
+    def contrast_and_brightness(self):
+        print(self.params)
+        return methods.contrast_and_brightness(self.image, alpha=self.params["contrast"],
+                                               beta=self.params["brightness"])

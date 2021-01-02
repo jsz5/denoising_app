@@ -103,14 +103,22 @@ def gamma_correction(gamma, image):
 
 
 def contrast_and_brightness(image, alpha, beta):
-    print("A")
-    for y in range(image.shape[0]):
-        for x in range(image.shape[1]):
-            for c in range(image.shape[2]):
-                image[y, x, c] = np.clip(alpha * image[y, x, c] + beta, 0, 255)
-    print("b")
+    image = np.array(image).astype(int)
+    image = np.clip(alpha * image + beta,0, 255)
     return image
 
+
+def color_balance(image, blue, green, red):
+    print(blue)
+    print(green)
+    print(red)
+    result = np.zeros(image.shape)
+    result[:, :, 0] = ((1 + 2 * blue) * image[:, :, 0] + (1 - green) * image[:, :, 1] + (1 - red) * image[:, :, 2]) / 3
+    result[:, :, 1] = ((1 + 2 * green) * image[:, :, 1] + (1 - blue) * image[:, :, 0] + (1 - red) * image[:, :, 2]) / 3
+    result[:, :, 2] = ((1 + 2 * red) * image[:, :, 2] + (1 - blue) * image[:, :, 0] + (1 - green) * image[:, :, 1]) / 3
+    # result = result / 255
+    print(result)
+    return result
 
 def remove_rain(rain_image, r, epsilon):
     low_frequency = np.empty(rain_image.shape)
@@ -135,4 +143,3 @@ def remove_rain(rain_image, r, epsilon):
     guided_filter3 = cv2.ximgproc.createGuidedFilter(refined, r, epsilon)
     result = guided_filter3.filter(cleared, result)
     return result
-

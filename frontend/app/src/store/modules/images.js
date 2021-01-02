@@ -3,80 +3,73 @@ import {baseUrl} from "../../utils/helper";
 
 const state = {
   refs: null,
-  fileUploadDialog: false,
-  addNoiseDialog: false,
-  removeNoiseDialog: false,
-  resultMat: null,
+  dialogs: {
+    "uploadFile": false,
+    "addNoise": false,
+    "removeNoise": false,
+    "brightnessContrast": false,
+    "hueSaturation": false
+  },
   noiseRadioGroup: null,
-  showFilter: null,
-  resultImageBlob: null,
   backendImageUrl: null,
   removeRainEpsilon: 0.1,
-  removeRainRadius: 8
+  removeRainRadius: 8,
 };
 
 const actions = {
   newImage(store, sourceImage) {
-
     const formData = new FormData();
     formData.append('new_image', sourceImage)
     return new Promise((resolve, reject) => {
       axios.post(baseUrl + '/images/upload/', formData, {headers: {'Content-Type': 'multipart/form-data'}})
         .then(function (response) {
-          resolve(response);
-          console.log(baseUrl + response.data)
           store.commit('setBackendImageUrl', response.data);
           let url = URL.createObjectURL(sourceImage)
           store.commit('setImageRefSrc', url);
-          let urlWithBase=baseUrl+response.data
-          store.commit('setCanvasOutput', {"url":urlWithBase});
-          store.commit('cancelUploadFile');
-          console.log(response.data)
+          let urlWithBase = baseUrl + response.data
+          store.commit('setCanvasOutput', {"url": urlWithBase});
+          store.commit('closeDialog', 'uploadFile');
+          resolve(response);
         })
         .catch(function (error) {
           reject(error);
-        });state.refs.canvasOutput
+        });
+      state.refs.canvasOutput
     })
   },
-  saveFiltersChange(store) {
-    let dataURL=state.refs.canvasOutput.toDataURL('image/png')
+  filtersChange(store, {params, method}) {
     const formData = new FormData();
-    formData.append('file', dataURL)
-    formData.append('old_url', state.backendImageUrl)
+    let backendImageUrl = store.getters.getBackendImageUrl
+    formData.append('image_url', backendImageUrl)
+    formData.append("method", method)
+    formData.append('params', params)
     return new Promise((resolve, reject) => {
-      axios.post(baseUrl + '/images/save-image/', formData, {
-        headers: {
-          'Content-Type': "multipart/form-data"
-        }
-      }).then(response => {
-        store.commit('setBackendImageUrl', response.data)
-        store.commit('cancelFilter');
-        store.commit('setCanvasOutput', {"url":baseUrl + response.data})
-
+      axios.post(baseUrl + '/images/image-processing/', formData).then(function (response) {
+        store.commit('setCanvasOutput', {"url": baseUrl + response.data});
         resolve(response);
-      }).catch(function (error) {
-        reject(error);
-      });
+      })
+        .catch(error => {
+          reject(error);
+        })
     })
-
+  },
+  cancelFiltersChangesDialog(store,{removeImageUrl,dialog}){
+     store.commit('closeDialog',dialog)
+        axios.post(baseUrl + '/images/remove-image/', {"image_url": removeImageUrl}).catch(error => {
+          console.log(error.response.data)
+        })
   }
-
 };
-
-
 const getters = {
-  getRefs(state) {
-    return state.refs
+  getBackendImageUrl(state) {
+    return state.backendImageUrl
   }
 };
-
-
 const mutations = {
   setImagesRef(state, refs) {
     state.refs = refs
   },
-  setCanvasOutput(state, {url, filters=null}) {
-    console.log(url)
+  setCanvasOutput(state, {url, filters = null}) {
     var img = new Image();
     img.onload = function () {
       var ctx = state.refs.canvasOutput.getContext('2d');
@@ -89,63 +82,19 @@ const mutations = {
     }
     img.crossOrigin = "anonymous"
     img.src = url
-    console.log(img.src)
-
   },
-  setOutputCanvas(imageUrl) {
-    var img = new Image();
-    img.onload = function () {
-      var ctx = state.refs.canvasOutput.getContext('2d');
-      ctx.drawImage(img, 0, 0);
+  openDialog(state, dialog) {
+    console.log(dialog)
+    state.dialogs[dialog] = true
+  },
+  closeDialog(state, dialog) {
+    state.dialogs[dialog] = false
+    if (dialog==="addNoise" || dialog==="removeNoise"){
+      state.noiseRadioGroup=null
     }
-    img.crossOrigin = "anonymous"
-    img.src = imageUrl
-  },
-  setOutputAsResult(state) {
-    state.resultImageBlob = state.refs.canvasOutput.toDataURL()
-    state.showBrightnessContrast = false
-  },
-  uploadFile(state) {
-    state.fileUploadDialog = true
-  },
-  removeNoise(state) {
-    state.removeNoiseDialog = true
-  },
-  cancelUploadFile(state) {
-    state.fileUploadDialog = false
-  },
-  addNoise(state) {
-    state.addNoiseDialog = true
-  },
-  cancelAddNoiseDialog(state) {
-    state.addNoiseDialog = false
-  },
-  cancelRemoveNoiseDialog(state) {
-    state.removeNoiseDialog = false
-  },
-  brightnessContrast(state) {
-    state.showFilter = "brightnessContrast"
-    state.refs.canvasOutput.setAttribute('style', 'filter:brightness(1) contrast(1) hue-rotate(1) saturate(1)');
-
-  },
-  hueSaturation(state) {
-    state.showFilter = "hueSaturation"
-    state.refs.canvasOutput.setAttribute('style', 'filter:brightness(1) contrast(1) hue-rotate(1) saturate(1)');
-  },
-
-  cancelFilter(state) {
-    state.showFilter = null
-    state.refs.canvasOutput.setAttribute('style', 'filter:brightness(1) contrast(1) hue-rotate(1) saturate(1)');
-
-  },
-  setResultMat(state, result) {
-    state.resultMat = result
   },
   setNoiseRadioGroup(state, value) {
     state.noiseRadioGroup = value
-  },
-  setInitialContrast(state) {
-    state.initialContrast = false
   },
   setRemoveRainRadius(state, value) {
     state.removeRainRadius = value
@@ -155,11 +104,6 @@ const mutations = {
   },
   setBackendImageUrl(state, url) {
     state.backendImageUrl = url
-    console.log("backend result")
-    console.log(state.backendImageUrl)
-  },
-  setResultImageBlob(state, url) {
-    state.resultImageBlob = url
   },
   setImageRefSrc(state, url) {
     state.refs.imageSrc.src = url

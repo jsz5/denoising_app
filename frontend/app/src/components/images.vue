@@ -17,8 +17,8 @@
                         filled
                         readonly
                 ></v-text-field>
-                <brightness-contrast v-if="showFilter==='brightnessContrast'"></brightness-contrast>
-                <hue-saturation v-if="showFilter==='hueSaturation'"></hue-saturation>
+                <brightness-contrast v-if="dialogs['brightnessContrast']"></brightness-contrast>
+                <hue-saturation v-if="dialogs['hueSaturation']"></hue-saturation>
             </v-col>
 
         </v-row>
@@ -49,7 +49,7 @@
       this.$store.commit("images/setImagesRef", this.$refs);
     },
     computed: {
-      ...mapState("images", ["showFilter"]),
+      ...mapState("images", ["dialogs"]),
 
     },
   }

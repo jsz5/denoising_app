@@ -42,14 +42,14 @@
           {"name": "Dodaj szum", "method": "addNoise"}
         ],
         "Obraz wynikowy": [
-          {"name": "Zmień kontrast i jasność", "method": "brightnessContrast"},
+          {"name": "Kontrast i jasność", "method": "brightnessContrast"},
           {"name": "Barwa i nasycenie", "method": "hueSaturation"}
         ]
       }
     }),
     methods: {
       callMethod(method) {
-        this.$store.commit("images/" + method);
+        this.$store.commit("images/openDialog" , method);
       }
     }
   }

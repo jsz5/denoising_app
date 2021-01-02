@@ -3,7 +3,7 @@
         <v-row justify="center">
 
             <v-dialog
-                    v-model="removeNoiseDialog"
+                    v-model="dialogs['removeNoise']"
                     persistent
                     max-width="590"
             >
@@ -17,11 +17,11 @@
                         Wybierz rodzaj szumu
                     </v-card-subtitle>
                     <v-card-text>
-                        <noise-type-v-card :remove="true"></noise-type-v-card>
+                        <noise-type-v-card :key="noiseRadioGroupKey" :remove="true"></noise-type-v-card>
                     </v-card-text>
                     <v-card-actions>
 
-                        <v-btn text @click="$store.commit('images/cancelRemoveNoiseDialog')">
+                        <v-btn text @click="cancelDialog">
                             Anuluj
                         </v-btn>
                         <v-btn text @click="removeNoise">
@@ -37,7 +37,7 @@
 </template>
 
 <script>
-  import {mapState, mapGetters} from "vuex";
+  import {mapState} from "vuex";
   import NoiseTypeVCard from "./base/noiseTypeVCard";
   import axios from "axios";
   import {baseUrl, removeRain, rain} from "@/utils/helper";
@@ -49,25 +49,14 @@
       return {
         noiseStepper: 1,
         addNoiseIntensitySlider: 0.02,
-        addNoiseIntensityMin: 0,
-        addNoiseIntensityMax: 0.2,
-        addNoiseIntensityStep: 0.01,
-        noiseMat: null,
-        noiseImage: null,
-        noiseBackendUrl: null
-
+        noiseRadioGroupKey:1
       }
     },
     computed: {
-      ...mapState("images", ["removeNoiseDialog", "refs", "resultMat", "noiseRadioGroup", "backendImageUrl", "setBackendImageUrl", "setCanvasOutput",
-        "removeRainRadius", "removeRainEpsilon"]),
-      ...mapGetters("images", ["getRefs"])
+      ...mapState("images", ["dialogs",  "noiseRadioGroup", "backendImageUrl",  "removeRainRadius", "removeRainEpsilon"]),
     },
     methods: {
-
       removeNoise() {
-        console.log(removeRain)
-        console.log(rain)
         const formData = new FormData();
         formData.append('image_url', this.backendImageUrl)
         if (this.noiseRadioGroup != rain) {
@@ -98,8 +87,12 @@
       saveChanges(data) {
         this.$store.commit('images/setBackendImageUrl', data);
         this.$store.commit('images/setCanvasOutput', {"url":baseUrl + data});
-        this.$store.commit('images/cancelRemoveNoiseDialog');
-      }
+        this.$store.commit('images/closeDialog','removeNoise');
+      },
+      cancelDialog(){
+         this.$store.commit('images/closeDialog', 'removeNoise')
+         this.noiseRadioGroupKey+=1
+      },
 
     }
   }

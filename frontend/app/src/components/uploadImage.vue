@@ -2,7 +2,7 @@
     <v-container>
         <v-row justify="center">
             <v-dialog
-                    v-model="fileUploadDialog"
+                    v-model="dialogs['uploadFile']"
                     persistent
                     max-width="290"
             >
@@ -29,7 +29,7 @@
                         </v-btn>
                         <v-btn
                                 text
-                                @click="$store.commit('images/cancelUploadFile')"
+                                @click="$store.commit('images/closeDialog','uploadFile')"
                         >
                             Anuluj
                         </v-btn>
@@ -52,7 +52,7 @@
       }
     },
     computed: {
-      ...mapState("images", ["fileUploadDialog"]),
+      ...mapState("images", ["dialogs"]),
     },
     methods: {
       ...mapActions("images", ["newImage"]),
