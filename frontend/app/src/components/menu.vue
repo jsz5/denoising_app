@@ -29,6 +29,10 @@
 </template>
 
 <script>
+  import axios from "axios";
+  import {mapState} from "vuex";
+  import {baseUrl} from "@/utils/helper";
+
   export default {
     name: "ImageMenu",
     data: () => ({
@@ -47,10 +51,29 @@
         ]
       }
     }),
+    computed: {
+      ...mapState("images", ["backendImageUrl"]),
+    },
     methods: {
       callMethod(method) {
-        this.$store.commit("images/openDialog" , method);
+        if (method !== "downloadFile") {
+          this.$store.commit("images/openDialog", method);
+        } else {
+          const formData = new FormData();
+          formData.append("image_url", this.backendImageUrl)
+          axios.get(baseUrl+this.backendImageUrl, {responseType: 'blob'})
+            .then(response => {
+              const blob = new Blob([response.data], {type:"image/png"})
+              const link = document.createElement('a')
+              link.href = URL.createObjectURL(blob)
+              link.download = "download"
+              link.click()
+              URL.revokeObjectURL(link.href)
+            }).catch(console.error)
+        }
+
       }
+
     }
   }
 </script>
