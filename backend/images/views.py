@@ -15,7 +15,6 @@ from neural_network.denoising import Denoising
 
 class ImageProcessingView(APIView):
     def post(self, request, *args, **kwargs):
-        print(request.data)
         serializer = ImageProcessingSerializer(data=request.data, context=self.get_serializer_context())
         serializer.is_valid(raise_exception=True)
         image_processing = ImageProcessing(image_url=serializer.data["image_url"], params=serializer.data["params"])

@@ -39,12 +39,15 @@ const actions = {
       state.refs.canvasOutput
     })
   },
-  filtersChange(store, {params, method}) {
+  filtersChange(store, {params, method,tmpImage}) {
     const formData = new FormData();
     let backendImageUrl = store.getters.getBackendImageUrl
     formData.append('image_url', backendImageUrl)
     formData.append("method", method)
     formData.append('params', params)
+    if(tmpImage){
+      formData.append('old_image',tmpImage)
+    }
     return new Promise((resolve, reject) => {
       axios.post(baseUrl + '/images/image-processing/', formData).then(function (response) {
         store.commit('setCanvasOutput', {"url": baseUrl + response.data});
@@ -101,7 +104,7 @@ const mutations = {
   setRemoveRainRadius(state, value) {
     state.removeRainRadius = value
   },
-  removeRainEpsilon(state, value) {
+  setRemoveRainEpsilon(state, value) {
     state.removeRainEpsilon = value
   },
   setBackendImageUrl(state, url) {

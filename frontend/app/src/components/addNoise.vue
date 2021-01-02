@@ -85,7 +85,7 @@
                                                                  color="primary"
                                             ></v-progress-circular>
                                         </div>
-                                    </v-row>                   
+                                    </v-row>
 
                                     <v-card-text class="v-card-noise-image" v-if="noiseRadioGroup!='rain'">
                                         <v-row>
@@ -106,13 +106,9 @@
                                                         @change="addNoiseByType"
                                                 >
                                                     <template v-slot:append>
-                                                        <v-text-field
-                                                                v-model="addNoiseIntensitySlider"
-                                                                class="mt-0 pt-0"
-                                                                hide-details
-                                                                single-line
-                                                                style="width: 60px"
-                                                        ></v-text-field>
+                                                        <v-subheader class="slider-subheader">
+                                                            {{addNoiseIntensitySlider}}
+                                                        </v-subheader>
                                                     </template>
                                                 </v-slider>
                                             </v-col>
@@ -139,13 +135,8 @@
                                                         @change="addNoiseByType"
                                                 >
                                                     <template v-slot:append>
-                                                        <v-text-field
-                                                                v-model="rainAngleSlider"
-                                                                class="mt-0 pt-0"
-                                                                hide-details
-                                                                single-line
-                                                                style="width: 60px"
-                                                        ></v-text-field>
+                                                        <v-subheader class="slider-subheader">{{rainAngleSlider}}
+                                                        </v-subheader>
                                                     </template>
                                                 </v-slider>
                                                 <v-subheader class="pl-0">
@@ -159,13 +150,8 @@
                                                         @change="addNoiseByType"
                                                 >
                                                     <template v-slot:append>
-                                                        <v-text-field
-                                                                v-model="rainKernelSlider"
-                                                                class="mt-0 pt-0"
-                                                                hide-details
-                                                                single-line
-                                                                style="width: 60px"
-                                                        ></v-text-field>
+                                                        <v-subheader class="slider-subheader">{{rainKernelSlider}}
+                                                        </v-subheader>
                                                     </template>
                                                 </v-slider>
                                                 <v-subheader class="pl-0">
@@ -179,13 +165,10 @@
                                                         @change="addNoiseByType"
                                                 >
                                                     <template v-slot:append>
-                                                        <v-text-field
-                                                                v-model="addNoiseIntensitySlider"
-                                                                class="mt-0 pt-0"
-                                                                hide-details
-                                                                single-line
-                                                                style="width: 60px"
-                                                        ></v-text-field>
+                                                        <v-subheader class="slider-subheader">
+                                                            {{addNoiseIntensitySlider}}
+                                                        </v-subheader>
+
                                                     </template>
                                                 </v-slider>
                                             </v-col>
@@ -236,7 +219,8 @@
         loading: false,
         rainRadius: 8,
         rainEpsilon: 0.1,
-        noiseRadioGroupKey: 1
+        noiseRadioGroupKey: 1,
+        title:""
       }
     },
     computed: {
@@ -287,34 +271,38 @@
           console.log(response.data)
           _this.noiseImage = baseUrl + response.data
           _this.noiseBackendUrl = response.data
-          _this.loading = false
+
         })
           .catch(error => {
             console.log(error.response.data)
-          })
-      },
+          }).finally(() => {
+          _this.loading = false
+          }
+        )
 
-      cancelAddNoiseDialog(oldImageUrl) {
-        this.cancelDialog()
-        axios.post(baseUrl + '/images/remove-image/', {"image_url": oldImageUrl}).catch(error => {
-          console.log(error.response.data)
-        })
-        this.noiseStepper = 1
-        this.noiseImage = null
-        this.noiseBackendUrl = null
-      },
-      cancelDialog() {
-        this.$store.commit('images/closeDialog', 'addNoise')
-        this.noiseRadioGroupKey += 1
-      },
-      acceptAddNoise() {
-        let backendUrl = this.backendImageUrl
-        this.$store.commit('images/setBackendImageUrl', this.noiseBackendUrl)
-        this.$store.commit('images/setCanvasOutput', {"url": baseUrl + this.noiseBackendUrl})
-        this.cancelAddNoiseDialog(backendUrl)
-      }
+    },
 
+    cancelAddNoiseDialog(oldImageUrl) {
+      this.cancelDialog()
+      axios.post(baseUrl + '/images/remove-image/', {"image_url": oldImageUrl}).catch(error => {
+        console.log(error.response.data)
+      })
+      this.noiseStepper = 1
+      this.noiseImage = null
+      this.noiseBackendUrl = null
+    },
+    cancelDialog() {
+      this.$store.commit('images/closeDialog', 'addNoise')
+      this.noiseRadioGroupKey += 1
+    },
+    acceptAddNoise() {
+      let backendUrl = this.backendImageUrl
+      this.$store.commit('images/setBackendImageUrl', this.noiseBackendUrl)
+      this.$store.commit('images/setCanvasOutput', {"url": baseUrl + this.noiseBackendUrl})
+      this.cancelAddNoiseDialog(backendUrl)
     }
+
+  }
   }
 </script>
 

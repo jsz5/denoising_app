@@ -24,7 +24,8 @@
                         <v-btn text @click="cancelDialog">
                             Anuluj
                         </v-btn>
-                        <v-btn text @click="removeNoise">
+                        <v-btn text @click="removeNoise" :loading=loading>
+
                             Ok
                         </v-btn>
                     </v-card-actions>
@@ -49,14 +50,16 @@
       return {
         noiseStepper: 1,
         addNoiseIntensitySlider: 0.02,
-        noiseRadioGroupKey:1
+        noiseRadioGroupKey: 1,
+        loading: false
       }
     },
     computed: {
-      ...mapState("images", ["dialogs",  "noiseRadioGroup", "backendImageUrl",  "removeRainRadius", "removeRainEpsilon"]),
+      ...mapState("images", ["dialogs", "noiseRadioGroup", "backendImageUrl", "removeRainRadius", "removeRainEpsilon"]),
     },
     methods: {
       removeNoise() {
+        this.loading = true
         const formData = new FormData();
         formData.append('image_url', this.backendImageUrl)
         if (this.noiseRadioGroup != rain) {
@@ -66,7 +69,10 @@
           })
             .catch(error => {
               console.log(error)
-            })
+            }).finally(() => {
+              this.loading = false
+            }
+          )
         } else {
           formData.append("method", removeRain)
           let params = {
@@ -81,17 +87,21 @@
           })
             .catch(error => {
               console.log(error)
-            })
+            }).finally(() => {
+              this.loading = false
+            }
+          )
         }
+
       },
       saveChanges(data) {
         this.$store.commit('images/setBackendImageUrl', data);
-        this.$store.commit('images/setCanvasOutput', {"url":baseUrl + data});
-        this.$store.commit('images/closeDialog','removeNoise');
+        this.$store.commit('images/setCanvasOutput', {"url": baseUrl + data});
+        this.$store.commit('images/closeDialog', 'removeNoise');
       },
-      cancelDialog(){
-         this.$store.commit('images/closeDialog', 'removeNoise')
-         this.noiseRadioGroupKey+=1
+      cancelDialog() {
+        this.$store.commit('images/closeDialog', 'removeNoise')
+        this.noiseRadioGroupKey += 1
       },
 
     }

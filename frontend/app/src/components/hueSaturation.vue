@@ -1,6 +1,6 @@
 <template>
     <v-container>
-        <dialog-drag :options='{ buttonClose:false,buttonPin:false,width:400 }' >
+        <dialog-drag :options='{ buttonClose:false,buttonPin:false,width:400 }'>
             <v-card
             >
                 <v-card-title>
@@ -23,13 +23,10 @@
 
                         >
                             <template v-slot:append>
-                                <v-text-field
-                                        v-model="redSlider"
-                                        class="mt-0 pt-0"
-                                        hide-details
-                                        single-line
-                                        style="width: 60px"
-                                ></v-text-field>
+                                <v-subheader class="slider-subheader">
+                                    {{redSlider}}
+                                </v-subheader>
+
                             </template>
                         </v-slider>
                     </v-row>
@@ -48,13 +45,10 @@
 
                         >
                             <template v-slot:append>
-                                <v-text-field
-                                        v-model="greenSlider"
-                                        class="mt-0 pt-0"
-                                        hide-details
-                                        single-line
-                                        style="width: 60px"
-                                ></v-text-field>
+                                <v-subheader class="slider-subheader">
+                                    {{greenSlider}}
+                                </v-subheader>
+
                             </template>
                         </v-slider>
                     </v-row>
@@ -73,13 +67,10 @@
 
                         >
                             <template v-slot:append>
-                                <v-text-field
-                                        v-model="blueSlider"
-                                        class="mt-0 pt-0"
-                                        hide-details
-                                        single-line
-                                        style="width: 60px"
-                                ></v-text-field>
+                                <v-subheader class="slider-subheader">
+                                    {{blueSlider}}
+                                </v-subheader>
+
                             </template>
                         </v-slider>
                     </v-row>
@@ -97,13 +88,10 @@
                         >
 
                             <template v-slot:append>
-                                <v-text-field
-                                        v-model="saturationSlider"
-                                        class="mt-0 pt-0"
-                                        hide-details
-                                        single-line
-                                        style="width: 60px"
-                                ></v-text-field>
+                                <v-subheader class="slider-subheader">
+                                    {{saturationSlider}}
+                                </v-subheader>
+
                             </template>
                         </v-slider>
                     </v-row>
@@ -124,7 +112,7 @@
                     </v-btn>
                 </v-card-actions>
             </v-card>
-          </dialog-drag>
+        </dialog-drag>
 
 
     </v-container>
@@ -138,7 +126,7 @@
 
   export default {
     name: "hueSaturation",
-      components: {
+    components: {
       DialogDrag
     },
 
@@ -152,10 +140,10 @@
       }
     },
     computed: {
-      ...mapState("images", ["backendImageUrl","dialogs"])
+      ...mapState("images", ["backendImageUrl", "dialogs"])
     },
     methods: {
-      ...mapActions("images", ["cancelFiltersChangesDialog","filtersChange"]),
+      ...mapActions("images", ["cancelFiltersChangesDialog", "filtersChange"]),
       changeHueSaturation() {
         let _this = this
         let params = JSON.stringify(
@@ -165,7 +153,7 @@
             "blue": this.blueSlider,
             "saturation": this.saturationSlider,
           })
-        this.filtersChange({"params": params, "method": color_balance}).then(
+        this.filtersChange({"params": params, "method": color_balance,"tmpImage":_this.tmpImage}).then(
           (response) => {
             _this.tmpImage = response.data
           },
@@ -177,15 +165,15 @@
       saveChanges() {
         let backendUrl = this.backendImageUrl
         this.$store.commit('images/setBackendImageUrl', this.tmpImage)
-         this.cancelFiltersChangesDialog({"removeImageUrl":backendUrl, "dialog":"hueSaturation"})
+        this.cancelFiltersChangesDialog({"removeImageUrl": backendUrl, "dialog": "hueSaturation"})
 
       },
       cancelChanges() {
         this.$store.commit('images/setCanvasOutput', {
           "url": baseUrl + this.backendImageUrl
         });
-        let _this=this
-         this.cancelFiltersChangesDialog({"removeImageUrl":_this.tmpImage, "dialog":"hueSaturation"})
+        let _this = this
+        this.cancelFiltersChangesDialog({"removeImageUrl": _this.tmpImage, "dialog": "hueSaturation"})
       }
     }
   }

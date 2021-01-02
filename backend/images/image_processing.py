@@ -15,8 +15,8 @@ class ImageProcessing:
         return methods.sp(self.image, self.params["intensity"])
 
     def rain(self):
-        return methods.rain(self.image, self.params["kernel_size"], self.params["angle"],
-                            self.params["intensity"])
+        return methods.rain(self.image, int(self.params["kernel_size"]), int(self.params["angle"]),
+                            float(self.params["intensity"]))
 
     def color_balance(self):
         image = np.array(self.image).astype(int)
@@ -27,9 +27,9 @@ class ImageProcessing:
         return result
 
     def remove_rain(self):
-        return methods.remove_rain(self.image, self.params["radius"], self.params["epsilon"])
+        print(self.params)
+        return methods.remove_rain(self.image, int(self.params["radius"]), float(self.params["epsilon"]))
 
     def contrast_and_brightness(self):
-        print(self.params)
         return methods.contrast_and_brightness(self.image, alpha=self.params["contrast"],
                                                beta=self.params["brightness"])

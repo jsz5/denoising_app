@@ -22,13 +22,8 @@
 
                         >
                             <template v-slot:append>
-                                <v-text-field
-                                        v-model="contrastSlider"
-                                        class="mt-0 pt-0"
-                                        hide-details
-                                        single-line
-                                        style="width: 60px"
-                                ></v-text-field>
+                                <v-subheader class="slider-subheader">{{contrastSlider}}</v-subheader>
+
                             </template>
                         </v-slider>
                     </v-row>
@@ -36,6 +31,7 @@
                         <v-subheader class="pl-0">
                             Jasność
                         </v-subheader>
+
                         <v-slider
                                 v-model="brightnessSlider"
                                 max="200"
@@ -46,13 +42,7 @@
                         >
 
                             <template v-slot:append>
-                                <v-text-field
-                                        v-model="brightnessSlider"
-                                        class="mt-0 pt-0"
-                                        hide-details
-                                        single-line
-                                        style="width: 60px"
-                                ></v-text-field>
+                                <v-subheader class="slider-subheader">{{brightnessSlider}}</v-subheader>
                             </template>
                         </v-slider>
                     </v-row>
@@ -105,7 +95,7 @@
             "contrast": this.contrastSlider,
             "brightness": this.brightnessSlider
           })
-        this.filtersChange({"params": params, "method": contrast_and_brightness}).then(
+        this.filtersChange({"params": params, "method": contrast_and_brightness,"tmpImage":_this.tmpImage}).then(
           (response) => {
             _this.tmpImage = response.data
           },

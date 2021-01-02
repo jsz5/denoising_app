@@ -133,3 +133,6 @@ label.v-label.theme--light{
 .v-subheader{
      color: var(--light) !important;
 }
+.slider-subheader{
+    padding-bottom: 25px;
+}
