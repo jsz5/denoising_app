@@ -156,64 +156,22 @@ def rms_contrast(filename, input_path, output_path, limit=80):
 
 
 if __name__ == '__main__':
-    # add_noise_by_contrast()
-    # exit()
-
-    # input_path = "./data/rain/gt"
-    input_path = "./imagenet/my_samples/my_gt"
-    files = os.listdir(input_path)
-    files_resized = os.listdir("./imagenet/my_samples/my_gt")
-    print(files_resized)
-    i = 0
-    mean_psnr = 0
-    p = 0.01
-    test_size = 3000
-    for file in files:
-        try:
-
-            noise = Noise(input_path, f"./imagenet/my_samples/my_gaussian02", file)
-            # noise.blur_image()
-
-            # noise.salt_and_pepper(prob_param=random.uniform(0.01, 0.3))
-            # noise.resize("./imagenet/resized")
-            # noise.gaussian_noise(sigma=random.uniform(0.01, 0.3))
-            # noise.remove_rain()
-            #
-            # angle = random.randrange(-3, 3)
-            # kernel_size = random.randrange(5, 40)
-            # angle = 0
-            # kernel_size = 20
-
-            # noise.add_rain(angle=angle, kernel_size=kernel_size,intensity=0.015)
-
-            # if i <= 2500:
-            #     noise.gaussian_noise(sigma=random.uniform(0.01, 0.3))
-            # elif 2500 < i <= 5000:
-
-            # noise.gaussian_noise(sigma=0.04 )
-            # noise.speckle_noise(snr=0.90)
-            # noise.contrast_and_brightness(1,0,)
-            noise.gaussian_noise(0.2)
-            # noise.salt_and_pepper(prob_param=random.uniform(0.01, 0.3))
-            # noise.salt_and_pepper(prob_param=0.1)
-            # noise.gaussian_noise(sigma=random.uniform(0.01, 0.3))
-            # i += 1
-            # if i>=2:
-            #     break
-            # if file not in files_resized:
-            # noise = Noise(input_path, "./data/rain/noise3", file)
-            # noise.resize("./imagenet/my_samples", crop=False)
-            # mean_psnr += noise.salt_and_pepper(p)
-
-            # else:
-            # noise.speckle_noise(sigma=random.uniform(0.05, 0.3))
-            # break
-        except Exception as e:
-            print(e)
-            logging.error(f"Image: {file}.png.{e}")
-    print(f"mean psnr: {mean_psnr / test_size}")
-    # ground_truth_image = cv2.imread("samples/resized/15063.png")
-    # predicted_image = cv2.imread("samples/rain_50_mse_leaky_relu/15063.png")
-    #
-    # m=ms.compare_ssim(ground_truth_image, predicted_image, multichannel=True)
-    # print(m)
+    try:
+        input_path, output_path, noise = [param for param in input().split()]
+        files = os.listdir(input_path)
+        for file in files:
+            try:
+                noise = Noise(input_path, output_path, file)
+                if noise == "sp":
+                    noise.salt_and_pepper(alpha=random.uniform(0.01, 0.3))
+                elif noise == "gaussian":
+                    noise.gaussian_noise(sigma=random.uniform(0.01, 0.3))
+                elif noise == "rain":
+                    angle = random.randrange(-3, 3)
+                    kernel_size = random.randrange(5, 40)
+                    noise.add_rain(angle=angle, kernel_size=kernel_size)
+            except Exception as e:
+                logging.error(f"Image: {file}.png.{e}")
+    except FileNotFoundError as e:
+        logging.error(f"Invalid path: {e}")
+        print("Podana ścieżka jest niepoprawa")

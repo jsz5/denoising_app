@@ -11,7 +11,7 @@ from neural_network.utils import get_net, prepare_transforms
 
 
 class Denoising:
-    def __init__(self, image, noise, activation=LEAKY_RELU, special=None, net_path=None):
+    def __init__(self, image, noise=None, activation=LEAKY_RELU, special=None, net_path=None):
         """
         @param image: image with noise
         @param noise: noise type

@@ -6,8 +6,8 @@ import torch.nn.functional as F
 from neural_network import config
 
 """
- @file common.py code has been written in project Deep image prior (https://github.com/DmitryUlyanov/deep-image-prior)
- @file skip.py code has been written in project Deep image prior (https://github.com/DmitryUlyanov/deep-image-prior)
+ @file common.py code from project Deep image prior (https://github.com/DmitryUlyanov/deep-image-prior)
+ @file skip.py code from in project Deep image prior (https://github.com/DmitryUlyanov/deep-image-prior)
 """
 
 
