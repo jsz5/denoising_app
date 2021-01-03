@@ -1,9 +1,14 @@
-import numpy as np
 import cv2
-import random
+import numpy as np
 
 
-def gaussian(image, sigma, mean=0):
+def gaussian(image, sigma):
+    """
+    @param image: original image
+    @param sigma: value of sigma that determines noise intensity
+    @return image with gaussian noise
+    """
+    mean=0
     image = image / 255
     # Generate Gaussian noise
     noise = np.random.normal(mean, sigma, image.shape)
@@ -16,6 +21,11 @@ def gaussian(image, sigma, mean=0):
 
 
 def sp(image, alpha):
+    """
+      @param image: original image
+      @param alpha: value of sigma that determines noise intensity
+      @return image with salt & pepper noise
+      """
     probability = 1 - alpha
     transposed_img = image.transpose(2, 1, 0)  # grupujemy każdy kolor
     channels, height, width = transposed_img.shape
@@ -27,34 +37,14 @@ def sp(image, alpha):
     return np.uint8(transposed_img.transpose(2, 1, 0))
 
 
-def rain(image, kernel_size, angle, intensity=None):
+def rain(image, kernel_size, angle, intensity):
     """
-         Parameters
-         ----------
-         intensity : float
-             Rain intensity
-         kernel_size:int
-             Drops length
-         angle: int
-             Rain angle (0 - horizontal, >0 sloping, <0 sloping to the other side)
-
-         ----------
-         intensity_by_angle_map - for angle 0 -> 0.002<=intensity<= 0.015
-         """
-
-    angle_param = angle
-    if angle < 0:
-        angle_param *= (-1)
-
-    if not intensity:
-        intensity_by_angle_map = {
-            0: [0.005, 0.015],
-            1: [0.015, 0.025],
-            2: [0.015, 0.025],
-            3: [0.04, 0.1]
-        }
-        intensity = random.uniform(intensity_by_angle_map[angle_param][0], intensity_by_angle_map[angle_param][1])
-
+    @param image: original image
+    @param kernel_size: determines rain drops length
+    @param angle: (int) determines drops angle, parameter in range [-3,3] (0 - horizontal, >0 sloping right, <0 sloping left)
+    @param intensity: determines rain intensity
+    @return image with rain
+    """
     image = cv2.cvtColor(image, cv2.COLOR_RGB2RGBA)
     n_channels = 4
     img = np.zeros((image.shape[0], image.shape[1], n_channels), dtype=np.uint8)
@@ -84,7 +74,7 @@ def rain(image, kernel_size, angle, intensity=None):
             for j in range(kernel.shape[1]):
                 if j == param:
                     kernel[i][j] = 1
-            param -= angle_param
+            param -= abs(angle)
     else:
         kernel[:, int((kernel_size - 1) / 2)] = np.ones(kernel_size)
 
@@ -96,6 +86,9 @@ def rain(image, kernel_size, angle, intensity=None):
 
 
 def gamma_correction(gamma, image):
+    """
+    Gamma correction used in algorithm that adds rain to images
+    """
     look_up = np.empty((1, 256), np.uint8)
     for i in range(256):
         look_up[0, i] = np.clip(pow(i / 255.0, gamma) * 255.0, 0, 255)
@@ -103,24 +96,39 @@ def gamma_correction(gamma, image):
 
 
 def contrast_and_brightness(image, alpha, beta):
+    """
+    @param image: original image
+    @param alpha: determines contrast value
+    @param beta: determines brightness value
+    @return image with changes contrast and brightness
+    """
     image = np.array(image).astype(int)
     image = np.clip(alpha * image + beta,0, 255)
     return image
 
 
 def color_balance(image, blue, green, red):
-    print(blue)
-    print(green)
-    print(red)
+    """
+
+    @param image: original image
+    @param blue: determines color balance on blue channel
+    @param green: determines color balance on green channel
+    @param red: determines color balance on red channel
+    @return image with changed color balance
+    """
     result = np.zeros(image.shape)
     result[:, :, 0] = ((1 + 2 * blue) * image[:, :, 0] + (1 - green) * image[:, :, 1] + (1 - red) * image[:, :, 2]) / 3
     result[:, :, 1] = ((1 + 2 * green) * image[:, :, 1] + (1 - blue) * image[:, :, 0] + (1 - red) * image[:, :, 2]) / 3
     result[:, :, 2] = ((1 + 2 * red) * image[:, :, 2] + (1 - blue) * image[:, :, 0] + (1 - green) * image[:, :, 1]) / 3
-    # result = result / 255
-    print(result)
     return result
 
 def remove_rain(rain_image, r, epsilon):
+    """
+    @param rain_image: image with rain
+    @param r: parameter of guided filter
+    @param epsilon: parameter of guided filter
+    @return image with removed rain
+    """
     low_frequency = np.empty(rain_image.shape)
     new_high_frequency = np.empty(rain_image.shape)
     result = np.empty(rain_image.shape)

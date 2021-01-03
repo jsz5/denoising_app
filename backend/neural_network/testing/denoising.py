@@ -1,45 +1,49 @@
 import os
 
+import numpy as np
 import torch
 from PIL import Image
 from torchvision import transforms
-import numpy as np
-from neural_network.skip import skip
-from neural_network.transoformers import GuidedFilterTransform, ToTensor
+
 from images.config import NET_PATHS
+from neural_network.config import LEAKY_RELU
+from neural_network.utils import get_net, prepare_transforms
+
 
 class Denoising:
-    def __init__(self, image, noise):
-        self.activation = "LeakyReLU"
+    def __init__(self, image, noise, activation=LEAKY_RELU, special=None, net_path=None):
+        """
+        @param image: image with noise
+        @param noise: noise type
+        """
+        self.activation = activation
+        self.special = special
         torch.backends.cudnn.enabled = True
         torch.backends.cudnn.benchmark = True
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.dtype = torch.cuda.FloatTensor
         self.image = Image.open(image).convert('RGB')
-        print(self.image)
         self.noise = noise
-        self.trained_network = self.__get_trained_network()
-
-    def get_net(self):
-        return skip(3, 3, num_channels_down=[128] * 5,
-                    num_channels_up=[128] * 5,
-                    num_channels_skip=[4] * 5,
-                    upsample_mode="bilinear",
-                    pad='reflection', act_fun=self.activation).type(self.dtype)
+        if net_path is None:
+            self.trained_network = self.__get_trained_network()
+        else:
+            self.trained_network = net_path
 
     def image_preprocess(self):
-        transforms_array = []
-        if self.noise == "rain":
-            transforms_array.append(GuidedFilterTransform())
-        transforms_array.append(ToTensor())
-        transform = transforms.Compose(transforms_array)
+        """
+        @return transformed tensor image
+        """
+        transform = prepare_transforms(self.special)
         transformed_image = transform(np.array(self.image))
         transformed_image = torch.from_numpy(transformed_image)
         batch_t = torch.unsqueeze(transformed_image, 0)
         return batch_t
 
     def denoise(self):
-        net = self.get_net()
+        """
+        @return denoised image after processing by trained neural network
+        """
+        net = get_net(self.activation, self.dtype)
         net.load_state_dict(torch.load(self.trained_network))
         noisy = self.image_preprocess()
         predicted = net(noisy.to(self.device))
@@ -47,4 +51,7 @@ class Denoising:
         return transforms.ToPILImage()(predicted.cpu()).convert("RGB")
 
     def __get_trained_network(self):
+        """
+        @return path to neural network used in web app by noise name
+        """
         return os.path.join(os.path.dirname(os.path.dirname(__file__)), NET_PATHS[self.noise])

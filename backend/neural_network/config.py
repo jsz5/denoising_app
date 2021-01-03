@@ -1,0 +1,10 @@
+MEDIAN_INPUT_ONLY = "median_input_only"
+GUIDED_FILTER = "multi_guided_filter"
+MSE = "mse"
+SSIM = "ssim"
+PERCEPTUAL_LOSS = "perceptual_loss"
+LEAKY_RELU = 'LeakyReLU'
+SWISH = "Swish"
+MISH = "Mish"
+DATA_LOGS_FILE = "data_logs.log"
+DATASET_SIZES_DEFAULT = {"train": 2000, "val": 500, "test": 500}

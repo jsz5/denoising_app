@@ -22,10 +22,5 @@ urlpatterns = [
         "remove-image/",
         views.RemoveImage.as_view(),
         name="remove-image",
-    ),
-    path(
-        "save-image/",
-        views.SaveImageDataURL.as_view(),
-        name="save-image",
     )
 ]
