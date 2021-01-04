@@ -1,14 +1,17 @@
+import logging
+
 from django.http import HttpResponse
 from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from images.config import WEBAPP_LOGS
 from images.image_processing import ImageProcessing
 from images.serializers import NoiseTypeSerializer, ImageProcessingSerializer, ImageSerializer
 from images.utils import image_to_numpy, save_image, remove_image, get_full_url
 from neural_network.testing.denoising import Denoising
 
-
+logging.basicConfig(filename=WEBAPP_LOGS, level=logging.DEBUG)
 class ImageProcessingView(APIView):
     """
     Processes input image and optionally deletes 'old_image'. Processed image is saved as a new image in file storage.
@@ -45,7 +48,8 @@ class RemoveNoise(APIView):
             predicted = Denoising(image=serializer.data["image_url"], noise=serializer.data["noise"]).denoise()
             remove_image(serializer.data["image_url"])
             return Response(save_image(predicted))
-        except RuntimeError:
+        except RuntimeError as e:
+            logging.error(f"Remove noise view: {e}")
             return HttpResponse("Wystąpił błąd. Za mało pamięci.", status=422)
 
     def get_serializer_context(self):
@@ -75,6 +79,7 @@ class RemoveImage(APIView):
             serializer = ImageSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             remove_image(get_full_url(serializer.data["image_url"]))
-        except FileNotFoundError:
+        except FileNotFoundError as e:
+            logging.error(f"Remove image view: {e}")
             return HttpResponse("Obraz nie istnieje.", status=404)
         return Response("Usunięto pomyślnie.")
