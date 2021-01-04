@@ -1,0 +1,8 @@
+backend/media/*
+latex
+html
+frontend/app/node_modules
+.cache/
+.idea
+.vscode
+__pycache__
