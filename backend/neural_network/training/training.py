@@ -107,8 +107,6 @@ class LearningNet:
         @return dataloaders with split training, validation and testing datasets
         """
         transform = prepare_transforms(self.special)
-        with zipfile.ZipFile("./drive/My Drive/inżynierska/imagenet_data.zip", 'r') as zip_ref:
-            zip_ref.extractall('./noise_remover/data')
         dataset = NoiseDataset(self.data_path, transform=transform)
         train_data, test_data = random_split(dataset, [self.dataset_sizes["train"],
                                                        self.dataset_sizes["val"] + self.dataset_sizes["test"]])

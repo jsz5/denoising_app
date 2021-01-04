@@ -83,7 +83,10 @@ class Noise:
         Applies median filter to original image and saves it to output_path.
         @param kernel_size: size of filter kernel
         """
-        result = cv2.medianBlur(self.image, kernel_size)
+        try:
+            result = cv2.medianBlur(self.image, kernel_size)
+        except Exception as e:
+            print(e)
         self.save_result(f"Median filter", result)
 
     def save_result(self, msg, result):
@@ -125,7 +128,7 @@ class Noise:
         @param r: parameter of guided filter
         @param epsilon: parameter of guided filter
         """
-        result = methods.remove_rain(self.image, r=8, epsilon=0.1)
+        result = methods.remove_rain(self.image, r=r, epsilon=epsilon)
         self.save_result(f"Remove rain", result)
 
 
@@ -157,19 +160,27 @@ def rms_contrast(filename, input_path, output_path, limit=80):
 
 if __name__ == '__main__':
     try:
-        input_path, output_path, noise = [param for param in input().split()]
+        input_path, output_path, noise_name = [param for param in input().split()]
+        if noise_name=="remove_rain":
+            r, epsilon = [param for param in input().split()]
+        if noise_name=="median":
+            k =input().split()[0]
         files = os.listdir(input_path)
         for file in files:
             try:
                 noise = Noise(input_path, output_path, file)
-                if noise == "sp":
+                if noise_name == "sp":
                     noise.salt_and_pepper(alpha=random.uniform(0.01, 0.3))
-                elif noise == "gaussian":
+                elif noise_name == "gaussian":
                     noise.gaussian_noise(sigma=random.uniform(0.01, 0.3))
-                elif noise == "rain":
+                elif noise_name == "rain":
                     angle = random.randrange(-3, 3)
                     kernel_size = random.randrange(5, 40)
                     noise.add_rain(angle=angle, kernel_size=kernel_size)
+                elif noise_name == "remove_rain":
+                    noise.remove_rain(int(r), float(epsilon))
+                elif noise_name == "median":
+                    noise.median_filter(int(k))
             except Exception as e:
                 logging.error(f"Image: {file}.png.{e}")
     except FileNotFoundError as e:

@@ -10,13 +10,9 @@ def gaussian(image, sigma):
     """
     mean=0
     image = image / 255
-    # Generate Gaussian noise
     noise = np.random.normal(mean, sigma, image.shape)
-    # Superimpose noise and image
     result = image + noise
-    # Set more than 1 to 1, and less than 0 to 0
     result = np.clip(result, 0, 1)
-    # Restore the gray scale of the picture to 0-255
     return np.uint8(result * 255)
 
 
@@ -48,7 +44,6 @@ def rain(image, kernel_size, angle, intensity):
     image = cv2.cvtColor(image, cv2.COLOR_RGB2RGBA)
     n_channels = 4
     img = np.zeros((image.shape[0], image.shape[1], n_channels), dtype=np.uint8)
-    # Generate Gaussian noise mean (0)
     noise = np.random.uniform(0, 255, (image.shape[0], image.shape[1], 1))
 
     # Rain intensity
