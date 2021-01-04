@@ -7,9 +7,10 @@
                 offset-y
         >
             <template v-slot:activator="{ attrs, on }">
-                <v-btn  class="menuButton"
-                        v-bind="attrs"
-                        v-on="on"
+                <v-btn class="menuButton"
+                       v-bind="attrs"
+                       v-on="on"
+
 
                 >
                     {{ key }}
@@ -21,6 +22,7 @@
                         :key="item['name']"
                         @click="callMethod(item['method'])"
                         link
+                        :disabled="item['method']!=='uploadFile' && !backendImageUrl"
                 >
                     <v-list-item-title v-text="item['name']"></v-list-item-title>
                 </v-list-item>
@@ -62,15 +64,17 @@
         } else {
           const formData = new FormData();
           formData.append("image_url", this.backendImageUrl)
-          axios.get(baseUrl+this.backendImageUrl, {responseType: 'blob'})
+          axios.get(baseUrl + this.backendImageUrl, {responseType: 'blob'})
             .then(response => {
-              const blob = new Blob([response.data], {type:"image/png"})
+              const blob = new Blob([response.data], {type: "image/png"})
               const link = document.createElement('a')
               link.href = URL.createObjectURL(blob)
               link.download = "download"
               link.click()
               URL.revokeObjectURL(link.href)
-            }).catch(console.error)
+            }).catch(error => {
+            console.log(error.response.data)
+          })
         }
 
       }

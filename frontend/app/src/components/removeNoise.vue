@@ -68,7 +68,7 @@
             this.saveChanges(response.data)
           })
             .catch(error => {
-              console.log(error)
+              console.log(error.response.data)
             }).finally(() => {
               this.loading = false
             }
@@ -86,7 +86,7 @@
             this.saveChanges(response.data)
           })
             .catch(error => {
-              console.log(error)
+              console.log(error.response.data)
             }).finally(() => {
               this.loading = false
             }

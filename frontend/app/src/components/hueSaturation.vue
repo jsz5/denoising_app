@@ -158,7 +158,7 @@
             _this.tmpImage = response.data
           },
           error => {
-            console.log(error.data)
+            console.log(error.response.data)
           }
         );
       },

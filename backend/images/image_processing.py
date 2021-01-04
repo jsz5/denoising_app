@@ -50,7 +50,6 @@ class ImageProcessing:
         """
         @return image with removed rain
         """
-        print(self.params)
         return methods.remove_rain(self.image, int(self.params["radius"]), float(self.params["epsilon"]))
 
     def contrast_and_brightness(self):

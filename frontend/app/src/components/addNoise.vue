@@ -268,10 +268,8 @@
         formData.append('params', JSON.stringify(params))
         formData.append('old_image', this.noiseBackendUrl)
         axios.post(baseUrl + '/images/image-processing/', formData).then(response => {
-          console.log(response.data)
           _this.noiseImage = baseUrl + response.data
           _this.noiseBackendUrl = response.data
-
         })
           .catch(error => {
             console.log(error.response.data)

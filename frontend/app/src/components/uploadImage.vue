@@ -20,7 +20,7 @@
                     </v-card-text>
                     <v-card-actions>
                         <v-spacer></v-spacer>
-                           <v-btn
+                        <v-btn
                                 text
                                 @click="$store.commit('images/closeDialog','uploadFile')"
                         >
@@ -57,15 +57,10 @@
     methods: {
       ...mapActions("images", ["newImage"]),
       uploadImage() {
-        let _this=this
-        this.newImage(_this.sourceImage).then(
-          () => {
-            console.log("aaaaaaa")
-          },
-          error => {
-            console.log(error.data)
-          }
-        );
+        let _this = this
+        this.newImage(_this.sourceImage).catch(error => {
+          console.log(error.response.data)
+        })
       }
     }
   }
