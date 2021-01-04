@@ -6,3 +6,4 @@ frontend/app/node_modules
 .idea
 .vscode
 __pycache__
+.log
