@@ -1,4 +1,4 @@
-backend/media/*
+#backend/media/*
 latex
 html
 frontend/app/node_modules
