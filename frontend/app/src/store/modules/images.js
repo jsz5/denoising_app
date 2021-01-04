@@ -89,7 +89,6 @@ const mutations = {
     img.src = url
   },
   openDialog(state, dialog) {
-    console.log(dialog)
     state.dialogs[dialog] = true
   },
   closeDialog(state, dialog) {
