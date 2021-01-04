@@ -1,5 +1,4 @@
 import json
-import zipfile
 
 import numpy as np
 import skimage.measure as ms
