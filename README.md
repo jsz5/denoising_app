@@ -1,1 +1,0 @@
-# denoising_app
