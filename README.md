@@ -1,9 +1,11 @@
 # O projekcie
-Aplikacja webowa pozwalająca na redukcje szumów pieprz i sól oraz gaussowskiego na obrazach cyfrowych oraz usunięciu smug deszczu. Szumy są usuwane przy użyciu wytrenowanej sieci neuronowej, a smugi deszczu za pomocą algorytmu wykorzystującego wielokrotne zastosowanie filtra guided.
+Aplikacja webowa pozwalająca na redukcje szumów pieprz i sól oraz gaussowskiego oraz smug deszczu na obrazach cyfrowych. Szumy są usuwane przy użyciu wytrenowanej sieci neuronowej, a smugi deszczu za pomocą algorytmu wykorzystującego wielokrotne zastosowanie filtra guided.
 
 Aplikacja umożliwia wgranie przetwarzanego obrazu, sztuczne dodanie zakłóceń do obrazu postaci: szumu gaussowskiego (modelującego różne stopnie wypalenia piksela), szumu pieprz i sól (modelującego uszkodzone oraz prześwietlone fragmenty zdjęcia) oraz smug deszczu. System pozwala na usunięcie zakłóceń powstałych naturalnie lub sztucznie i zapisanie obrazu wynikowego. Ponadto do funkcjonalności należy zmiana kontrastu, jasności, nasycenia i barwy obrazu w celu korekty wizualnej zdjęcia spowodowanej operacją usuwania szumu.
 
-
+### Przykład usunięcia szumu pieprz i sól:
+<img src="https://github.com/jsz5/denoising_app/blob/master/example/noise.JPG" alt="noise_image" width=350/>
+<img src="https://github.com/jsz5/denoising_app/blob/master/example/denoised.JPG" alt="denoised_image" width=350/>
 
 ### Pierwsze uruchomienie aplikacji
 Należy uruchomić skrypty ./build_web_app_backend.sh oraz ./build_web_app_frontend.sh.
