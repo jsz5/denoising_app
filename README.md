@@ -1,7 +1,8 @@
 # O projekcie
-Aplikacja webowa pozwalająca na redukcje szumów pieprz i sól oraz gaussowskiego na obrazach cyfrowych oraz usunięciu smug deszczu. Szumy są usuwane przy użyciu sieci neuronowej, a smugi deszczu za pomocą algorytmu wykorzystującego wielokrotne zastosowanie filtra guided.
+Aplikacja webowa pozwalająca na redukcje szumów pieprz i sól oraz gaussowskiego na obrazach cyfrowych oraz usunięciu smug deszczu. Szumy są usuwane przy użyciu wytrenowanej sieci neuronowej, a smugi deszczu za pomocą algorytmu wykorzystującego wielokrotne zastosowanie filtra guided.
 
 Aplikacja umożliwia wgranie przetwarzanego obrazu, sztuczne dodanie zakłóceń do obrazu postaci: szumu gaussowskiego (modelującego różne stopnie wypalenia piksela), szumu pieprz i sól (modelującego uszkodzone oraz prześwietlone fragmenty zdjęcia) oraz smug deszczu. System pozwala na usunięcie zakłóceń powstałych naturalnie lub sztucznie i zapisanie obrazu wynikowego. Ponadto do funkcjonalności należy zmiana kontrastu, jasności, nasycenia i barwy obrazu w celu korekty wizualnej zdjęcia spowodowanej operacją usuwania szumu.
+
 
 
 ### Pierwsze uruchomienie aplikacji
@@ -14,3 +15,10 @@ Należy uruchomić skrypt start_web_app.sh. Część frontendowa znajduje się p
 
 ### Zatrzymanie aplikacji
 Należy uruchomić skrypt stop_web_app.sh.
+
+## Bibliografia
+<a id="1">[1]</a> 
+V. Lempitsky, A. Vedaldi and D. Ulyanov, "Deep Image Prior," 2018 IEEE/CVF Conference on Computer Vision and Pattern Recognition, Salt Lake City, UT, USA, 2018, pp. 9446-9454, doi: 10.1109/CVPR.2018.00984. https://dmitryulyanov.github.io/deep_image_prior
+
+<a id="2">[2]</a>
+Zheng, Xianhui & Liao, Yinghao & Guo, Wei & Fu, Xueyang & Ding, Xinghao. (2013). Single-Image-Based Rain and Snow Removal Using Multi-guided Filter. 258-265. 10.1007/978-3-642-42051-1_33. 
