@@ -7,6 +7,8 @@ Aplikacja umożliwia wgranie przetwarzanego obrazu, sztuczne dodanie zakłóceń
 <img src="https://github.com/jsz5/denoising_app/blob/master/examples/sp03/noise.JPG" alt="noise_image" width=350/>
 <img src="https://github.com/jsz5/denoising_app/blob/master/examples/sp03/denoised.JPG" alt="denoised_image" width=350/>
 
+Przykłady pozostałych zakłóceń znajdują się w folderze ./examples
+
 ### Pierwsze uruchomienie aplikacji
 Należy uruchomić skrypty ./build_web_app_backend.sh oraz ./build_web_app_frontend.sh.
 Następnie w folderze /frontend/app należy wykonać komendę npm install.
